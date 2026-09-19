@@ -278,7 +278,7 @@ paytm/
 │   ├── n8n.ts · n8n-workflows.ts                # programmatic n8n deployment
 │   ├── cognee.ts · memory-log.ts                # memory client + audit trail
 │   └── sarvam.ts · wav.ts  # Sarvam clients + browser audio conversion
-├── scripts/demo.ts · lib/pipeline.ts            # one-command end-to-end proof
+├── lib/demo.ts · lib/pipeline.ts                # one-command end-to-end proof
 ├── docs/screenshots/                            # the images in this README
 ├── PROGRESS.md                                  # decision log
 └── README.md
