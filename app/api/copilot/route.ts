@@ -69,11 +69,36 @@ function trimAnswer(raw: string, maxSentences = 2, maxChars = 260): string {
   return picked;
 }
 
+interface Turn {
+  role?: string;
+  text?: string;
+}
+
+/**
+ * Short-term (working) memory: a sliding window of the last few conversation
+ * turns, sent by the client each request. Nothing is persisted server-side;
+ * the merchant's device holds the session. Only compact text enters the
+ * context window, never raw history dumps.
+ */
+function historyBlock(history: Turn[] | undefined, maxTurns = 6, maxCharsPerTurn = 200): string {
+  if (!Array.isArray(history) || history.length === 0) return "";
+  const lines = history
+    .slice(-maxTurns)
+    .map((h) => {
+      const who = h.role === "user" ? "Merchant" : "RADAAR";
+      const text = String(h.text ?? "").replace(/\s+/g, " ").trim().slice(0, maxCharsPerTurn);
+      return text ? `${who}: ${text}` : "";
+    })
+    .filter(Boolean);
+  return lines.length ? `\nConversation so far (most recent last):\n${lines.join("\n")}\n` : "";
+}
+
 export async function POST(req: Request) {
   try {
-    const { message } = (await req.json()) as { message?: string };
-    const q = (message ?? "").trim();
+    const body = (await req.json()) as { message?: string; history?: Turn[] };
+    const q = (body.message ?? "").trim();
     if (!q) return NextResponse.json({ ok: false, error: "empty message" }, { status: 400 });
+    const history = historyBlock(body.history);
 
     // 1) Preferred path: the merchant's Cognee memory graph (grounded, learned)
     try {
@@ -94,7 +119,7 @@ export async function POST(req: Request) {
 
     // 2) Fallback: Sarvam answers strictly from the live snapshot facts
     const answer = await sarvamChat(
-      `Merchant data: ${snapshotFacts()}\n\nQuestion: ${q}\n\nAnswer in at most 2 short sentences using ONLY the data above. If the answer is not in the data, say what related information IS available. Reply in the same language as the question (Hinglish if mixed).`,
+      `Merchant data: ${snapshotFacts()}${history}\nQuestion: ${q}\n\nAnswer in at most 2 short sentences using ONLY the data above. If the question refers to the conversation so far ("it", "that offer", "why"), use it for context. If the answer is not in the data, say what related information IS available. Reply in the same language as the question (Hinglish if mixed).`,
       { system: "You are RADAAR, a concise business copilot for an Indian merchant. Never use more than two sentences.", maxTokens: 250 },
     );
     return NextResponse.json({ ok: true, answer: trimAnswer(answer), source: "live-snapshot" });

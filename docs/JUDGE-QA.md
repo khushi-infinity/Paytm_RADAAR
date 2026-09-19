@@ -81,6 +81,35 @@ Three workflows, **deployed programmatically** through the n8n public API (`npm 
 
 **Why a graph, not a vector DB:** "Vector search returns similar text. The graph returns a *because*: offer → outcome → lesson. The compounding connection is the product."
 
+## Memory architecture: short-term, long-term, and why context is never "lost"
+
+Judges with an ML background will probe this. Three layers, each with a clear job:
+
+**1. Long-term memory = the Cognee graph (per merchant, permanent).**
+Seven typed fact types are cognified into a knowledge graph: profile, trends, anomalies, segments, insights, offers, outcomes. Facts are deterministic sentences shaped by code, so memory quality is controlled at write time. This memory is **structured, not a text dump**: offer facts connect to outcome facts, which is what lets the system answer *because* questions ("why should I trust this offer?"). It compounds: every measured outcome makes the next recommendation more grounded. Nothing expires; the merchant can inspect every fact in the app and the Cognee console.
+
+**2. Short-term memory = a sliding conversation window (per session).**
+The chat keeps the last 6 turns (each truncated to 200 chars) on the client and sends them with every request. The server injects them as a compact "Conversation so far" block next to the question. This is why follow-ups like "और पिछले हफ़्ते से तुलना?" or "why?" work without repeating the question. Nothing is persisted server-side; the merchant's device holds the session, which is also a privacy guardrail.
+
+**3. The live snapshot = the always-fresh context floor.**
+Every copilot call re-grounds on current facts (weekly revenue, health score, segments, top recommendations) generated deterministically from the transaction data. So even a brand-new session answers from today's numbers, never a stale cache.
+
+**How context gets lost in naive bots, and what we do instead:**
+- **Lost by truncation**: naive bots paste the whole transcript until the model's context window overflows and old turns fall off silently. We never paste raw transcripts: short-term context is a size-capped summary block (6 turns × 200 chars), long-term facts live in the graph where retrieval is selective, not sequential.
+- **Lost by distance**: relevant facts sit thousands of tokens back in a long chat. We retrieve *per question*: the graph search pulls only the facts related to this question, so relevant memory arrives adjacent to the question no matter how old it is.
+- **Lost by staleness**: a summarized session memory goes stale. Our snapshot layer re-computes fresh facts on every call.
+
+**The RAG flow, concretely (say this when asked "how do you do RAG?"):**
+1. Question arrives ("पिछले ऑफ़र का क्या नतीजा आया?")
+2. **Retrieve**: Cognee CHUNKS probe confirms the graph has data, then GRAPH_COMPLETION retrieves the offer/outcome subgraph relevant to the question (semantic + graph traversal, not keyword matching)
+3. **Augment**: retrieved facts are the grounding context; the model is instructed to answer ONLY from them
+4. **Generate**: the answer comes back with a provenance badge (🧠 graph / 📊 live facts) shown to the merchant
+5. If retrieval finds nothing relevant, the system says so instead of generating. **Refusal is a retrieval feature, not a failure.**
+
+**Retrieval tuning we actually shipped:** 60s graph-readiness cache (so repeated questions skip the probe), 45s per-search timeout (a cold graph falls back to snapshot facts fast), 2-sentence answer cap applied after generation (so grounding, not verbosity, reaches the merchant), markdown stripped server-side.
+
+**Why Cognee's graph RAG over classic vector RAG:** vector stores return *similar text*; the graph returns *connected facts with relations*. "Offer X → dispatched to 935 customers → outcome +₹5,750 → lesson: combos work" is one traversal, not four near-miss chunks stitched by an LLM. The relations are the memory.
+
 ## Sarvam in one breath (they will ask)
 
 sarvam-105b writes every nudge and answers the copilot in Hindi/English/Hinglish; saarika:v2.5 turns mic audio into text; bulbul:v3 speaks every answer, auto-switching Hindi/English voice by script. The merchant's language is the product, and one vendor covers the full loop.

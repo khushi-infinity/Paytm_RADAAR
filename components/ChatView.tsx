@@ -104,7 +104,12 @@ export default function ChatView() {
       const res = await fetch("/api/copilot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: q }),
+        body: JSON.stringify({
+          message: q,
+          // short-term memory: the last few turns ride along so follow-ups like
+          // "और पिछले हफ़्ते से तुलना?" keep their context
+          history: messages.slice(-6).map((m) => ({ role: m.role, text: m.text })),
+        }),
       });
       const j = (await res.json()) as { ok: boolean; answer?: string; source?: string };
       const fallback =
