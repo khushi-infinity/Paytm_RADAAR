@@ -239,7 +239,9 @@ terminal) · `npm run typecheck` · deep links `?lang=hi|en` and
 `?tab=home|business|chat` (used for the screenshots above, handy for demos).
 
 **Deploying?** See [DEPLOY.md](DEPLOY.md): Railway (recommended) or Vercel,
-env vars, and a demo-day checklist.
+env vars, and a demo-day checklist. **Presenting to judges?** See
+[docs/JUDGE-QA.md](docs/JUDGE-QA.md): guardrails, capability list, and the
+n8n/Cognee deep-dive script.
 
 ## Design: why it looks like this
 
