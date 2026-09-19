@@ -35,7 +35,7 @@ function TabBar() {
     { id: "chat", icon: "💬", label: "tabChat" },
   ];
   return (
-    <div className="sticky bottom-0 z-10 bg-gradient-to-t from-[#2C68E4] via-[#2C68E4]/80 to-transparent pb-5 pt-6">
+    <div className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-[#2C68E4] via-[#2C68E4]/90 to-transparent pb-5 pt-8">
       <div
         className="mx-auto flex max-w-xl items-end gap-3 rounded-[2rem] bg-white/15 p-2.5 backdrop-blur"
         style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.3), 0 10px 26px rgba(9,34,84,.35)" }}
@@ -86,12 +86,12 @@ function Shell() {
     <div className="relative min-h-screen overflow-x-hidden">
       <Scenery />
       {/* DADA mascot: bottom-right companion, like the reference's fox */}
-      <div className="pointer-events-none fixed bottom-16 right-4 z-0 hidden lg:block">
+      <div className="pointer-events-none fixed bottom-28 right-4 z-0 hidden xl:block">
         <div className="mascot-bob">
           <Mascot size={290} className="drop-shadow-2xl" />
         </div>
       </div>
-      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-8">
+      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-8 pb-32">
         <header className="flex items-center justify-between pb-4 pt-6">
           <div className="flex items-center gap-4">
             <div
@@ -132,9 +132,8 @@ function Shell() {
             <ChatView />
           )}
         </main>
-
-        <TabBar />
       </div>
+      <TabBar />
     </div>
   );
 }

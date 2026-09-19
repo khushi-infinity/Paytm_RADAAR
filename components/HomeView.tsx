@@ -3,7 +3,7 @@
 import { useSession } from "@/lib/session";
 import { t } from "@/lib/i18n";
 import { fmtMoney, fmtPct, deltaPhrase, cardViews } from "@/lib/friendly";
-import Radar3D from "./Radar3D";
+import RadarDish from "./RadarDish";
 import Mascot from "./Mascot";
 
 function greetingKey(): "goodMorning" | "goodAfternoon" | "goodEvening" {
@@ -54,7 +54,7 @@ function Pipeline({ stage, lang }: { stage: string; lang: "en" | "hi" }) {
 }
 
 export default function HomeView() {
-  const { lang, snap, friendly: fr, offerStage, offer, outcome, createOffer, measureOutcome } = useSession();
+  const { lang, snap, friendly: fr, stageOf, offerOf, outcomeOf, createOffer, measureOutcome } = useSession();
   if (!fr || !snap) return null;
 
   const mood = fr.healthMood;
@@ -127,11 +127,13 @@ export default function HomeView() {
         {/* mascot line + action cards */}
         {cards.map((card, idx) => {
           const st = SEV[card.severity];
-          const hostsFlow = idx === 0;
+          const offerStage = stageOf(card.id);
+          const offer = offerOf(card.id);
+          const outcome = outcomeOf(card.id);
           const mid = Math.round((card.impactLow + card.impactHigh) / 2);
           return (
-            <section key={card.signal} className="card3d card3d-hover pop-in p-6" style={{ animationDelay: `${0.2 + idx * 0.07}s`, borderTop: `6px solid ${st.bar}` }}>
-              {hostsFlow && (
+            <section key={card.id} className="card3d card3d-hover pop-in p-6" style={{ animationDelay: `${0.2 + idx * 0.07}s`, borderTop: `6px solid ${st.bar}` }}>
+              {idx === 0 && (
                 <div className="mb-3 flex items-center gap-3">
                   <div className="mascot-bob">
                     <Mascot size={64} />
@@ -165,14 +167,13 @@ export default function HomeView() {
                 </div>
               )}
 
-              {hostsFlow && <Pipeline stage={offerStage} lang={lang} />}
+              <Pipeline stage={offerStage} lang={lang} />
 
-              {hostsFlow && (
-                <div className="mt-5">
-                  {offerStage === "idle" || offerStage === "error" ? (
+              <div className="mt-5">
+                {offerStage === "idle" || offerStage === "error" ? (
                     <button
                       onClick={() =>
-                        void createOffer(card.signal, card.why, card.action, card.impactLow, card.impactHigh, card.targetSize)
+                        void createOffer(card.id, card.signal, card.why, card.action, card.impactLow, card.impactHigh, card.targetSize)
                       }
                       className="btn3d btn3d-orange w-full"
                     >
@@ -217,7 +218,7 @@ export default function HomeView() {
                         </a>
                       </div>
                       {offerStage === "sent" && (
-                        <button onClick={() => void measureOutcome()} className="btn3d btn3d-sky w-full">
+                        <button onClick={() => void measureOutcome(card.id)} className="btn3d btn3d-sky w-full">
                           📅 {t(lang, "measureOutcome")}
                         </button>
                       )}
@@ -240,7 +241,6 @@ export default function HomeView() {
                     </div>
                   )}
                 </div>
-              )}
             </section>
           );
         })}
@@ -254,7 +254,7 @@ export default function HomeView() {
             <span className="chip3d bg-bluemist text-royal">{fr.radarBlips.length}</span>
           </div>
           <div className="min-h-[360px] flex-1">
-            <Radar3D blips={fr.radarBlips} />
+            <RadarDish blips={fr.radarBlips} />
           </div>
           <p className="text-center text-xs font-bold text-cocoa">✨ {t(lang, "radarHint")}</p>
         </section>

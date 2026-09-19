@@ -37,12 +37,12 @@ interface SessionCtx {
   loading: boolean;
   loadError: string | null;
   reload: () => void;
-  // offer loop
-  offerStage: OfferStage;
-  offer: OfferInfo | null;
-  outcome: OutcomeInfo | null;
-  createOffer: (signal: string, why: string, action: string, impactLow: number, impactHigh: number, targetSize: number) => Promise<void>;
-  measureOutcome: () => Promise<void>;
+  // offer loop — per card, keyed by card id so every card runs its own loop
+  stageOf: (cardId: string) => OfferStage;
+  offerOf: (cardId: string) => OfferInfo | null;
+  outcomeOf: (cardId: string) => OutcomeInfo | null;
+  createOffer: (cardId: string, signal: string, why: string, action: string, impactLow: number, impactHigh: number, targetSize: number) => Promise<void>;
+  measureOutcome: (cardId: string) => Promise<void>;
 }
 
 const Ctx = createContext<SessionCtx | null>(null);
@@ -64,9 +64,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [snap, setSnap] = useState<BusinessSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [offerStage, setOfferStage] = useState<OfferStage>("idle");
-  const [offer, setOffer] = useState<OfferInfo | null>(null);
-  const [outcome, setOutcome] = useState<OutcomeInfo | null>(null);
+  const [offerStages, setOfferStages] = useState<Record<string, OfferStage>>({});
+  const [offers, setOffers] = useState<Record<string, OfferInfo>>({});
+  const [outcomes, setOutcomes] = useState<Record<string, OutcomeInfo>>({});
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
@@ -79,8 +79,14 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
+      // deep links: ?lang=en|hi and ?tab=home|business|chat (also used for screenshots)
+      const q = new URLSearchParams(window.location.search);
+      const qLang = q.get("lang");
+      if (qLang === "en" || qLang === "hi") setLangState(qLang);
+      const qTab = q.get("tab");
+      if (qTab === "home" || qTab === "business" || qTab === "chat") setTab(qTab);
       const saved = localStorage.getItem("radaar_lang");
-      if (saved === "en" || saved === "hi") setLangState(saved);
+      if (!qLang && (saved === "en" || saved === "hi")) setLangState(saved);
     } catch {
       /* private mode */
     }
@@ -107,6 +113,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const createOffer = useCallback(
     async (
+      cardId: string,
       signal: string,
       why: string,
       action: string,
@@ -114,8 +121,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       impactHigh: number,
       targetSize: number,
     ) => {
-      if (!snap || offerStage === "sending") return;
-      setOfferStage("sending");
+      if (!snap || offerStages[cardId] === "sending") return;
+      setOfferStages((s) => ({ ...s, [cardId]: "sending" }));
       try {
         const res = await fetch("/api/offer", {
           method: "POST",
@@ -138,46 +145,53 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           error?: string;
         };
         if (!res.ok || !j.ok || !j.offerId) throw new Error(j.error ?? "offer failed");
-        setOffer({ offerId: j.offerId, nudgeHi: j.nudgeHi ?? "", nudgeEn: j.nudgeEn ?? "" });
-        setOfferStage("sent");
+        setOffers((o) => ({ ...o, [cardId]: { offerId: j.offerId!, nudgeHi: j.nudgeHi ?? "", nudgeEn: j.nudgeEn ?? "" } }));
+        setOfferStages((s) => ({ ...s, [cardId]: "sent" }));
       } catch {
-        setOfferStage("error");
+        setOfferStages((s) => ({ ...s, [cardId]: "error" }));
       }
     },
-    [snap, offerStage],
+    [snap, offerStages],
   );
 
-  const measureOutcome = useCallback(async () => {
-    if (!snap || !offer || offerStage !== "sent") return;
-    setOfferStage("measured"); // optimistic; the API is fast (simulated week)
-    try {
-      const res = await fetch("/api/outcome", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          offerId: offer.offerId,
-          action: "",
-          audienceSize: 0,
-          weeklyRevenue: snap.revenue.thisWeek,
-          merchant: snap.merchantName,
-        }),
-      });
-      const j = (await res.json()) as {
-        ok?: boolean;
-        revenueDelta?: number;
-        upliftPct?: number;
-        verdict?: string;
-      };
-      if (!res.ok || !j.ok) throw new Error("outcome failed");
-      setOutcome({
-        revenueDelta: j.revenueDelta ?? 0,
-        upliftPct: j.upliftPct ?? 0,
-        verdict: j.verdict ?? "worked",
-      });
-    } catch {
-      setOfferStage("sent"); // allow retry
-    }
-  }, [snap, offer, offerStage]);
+  const measureOutcome = useCallback(
+    async (cardId: string) => {
+      const offer = offers[cardId];
+      if (!snap || !offer || offerStages[cardId] !== "sent") return;
+      setOfferStages((s) => ({ ...s, [cardId]: "measured" })); // optimistic; the API is fast (simulated week)
+      try {
+        const res = await fetch("/api/outcome", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            offerId: offer.offerId,
+            action: "",
+            audienceSize: 0,
+            weeklyRevenue: snap.revenue.thisWeek,
+            merchant: snap.merchantName,
+          }),
+        });
+        const j = (await res.json()) as {
+          ok?: boolean;
+          revenueDelta?: number;
+          upliftPct?: number;
+          verdict?: string;
+        };
+        if (!res.ok || !j.ok) throw new Error("outcome failed");
+        setOutcomes((o) => ({
+          ...o,
+          [cardId]: {
+            revenueDelta: j.revenueDelta ?? 0,
+            upliftPct: j.upliftPct ?? 0,
+            verdict: j.verdict ?? "worked",
+          },
+        }));
+      } catch {
+        setOfferStages((s) => ({ ...s, [cardId]: "sent" })); // allow retry
+      }
+    },
+    [snap, offers, offerStages],
+  );
 
   const fr = useMemo(() => (snap ? friendly(snap) : null), [snap]);
 
@@ -191,9 +205,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     loading,
     loadError,
     reload: () => void load(),
-    offerStage,
-    offer,
-    outcome,
+    stageOf: (cardId) => offerStages[cardId] ?? "idle",
+    offerOf: (cardId) => offers[cardId] ?? null,
+    outcomeOf: (cardId) => outcomes[cardId] ?? null,
     createOffer,
     measureOutcome,
   };

@@ -34,6 +34,7 @@ export interface FriendlyNumbers {
 }
 
 export interface CardView {
+  id: string;
   severity: "opportunity" | "watch" | "critical";
   signal: string;
   why: string;
@@ -78,6 +79,7 @@ export function cardViews(snap: BusinessSnapshot, lang: Lang): CardView[] {
     const id = o?.id ?? "";
     const size = o?.targetSize ?? 0;
     return {
+      id: o?.id ?? c.id,
       severity: c.severity,
       signal:
         lang === "hi" && o
