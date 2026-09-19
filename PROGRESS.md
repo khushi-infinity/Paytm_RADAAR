@@ -24,3 +24,4 @@ Merchant-friendly rebuild of RADAAR. Companion project to `../Paytm_Build` (the 
 | 2026-09-19 | Deep links `?lang=` and `?tab=` | Deterministic states for screenshots and demos |
 | 2026-09-19 | Flagship README with 6 desktop screenshots, architecture diagram, per-sponsor sections | Same bar as the Paytm_Build README |
 | 2026-09-19 | Em dash sweep: 26 source files + README/PROGRESS/.env.example cleaned (comma or hyphen), friendly.ts sanitizer rewritten with unicode escapes so it keeps sanitizing | User directive: remove em dashes everywhere; sanitizer must not re-introduce them |
+| 2026-09-19 | New GitHub repo: https://github.com/khushi-infinity/Paytm_RADAAR.git - THIS is the repo for this project (Desktop/paytm). Do NOT push to the old khushi-infinity/RADAAR.git (that belongs to the Desktop/Paytm_Build judge build) | User instruction; the two projects stay in separate repos |
