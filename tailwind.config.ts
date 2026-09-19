@@ -26,6 +26,7 @@ const config: Config = {
       boxShadow: {
         soft: "0 6px 24px rgba(200, 170, 120, 0.18)",
         pop: "0 10px 30px rgba(229, 84, 58, 0.25)",
+        lift: "0 18px 40px rgba(196, 158, 96, 0.22)",
       },
       borderRadius: {
         blob: "2rem",

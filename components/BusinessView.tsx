@@ -68,21 +68,30 @@ export default function BusinessView() {
   const totalTxs = snap.paymentMix.reduce((s, p) => s + p.count, 0) || 1;
 
   return (
-    <div className="space-y-4 px-4 pb-6">
+    <div className="grid grid-cols-12 gap-6 pb-4">
       {/* trends */}
-      <div className="card">
-        <h2 className="text-lg font-extrabold text-ink">📈 {t(lang, "bizTrends")}</h2>
-        <ul className="mt-2 space-y-2">
-          {snap.trends.map((tr) => {
+      <section className="card3d pop-in col-span-7 p-6">
+        <h3 className="text-xl font-extrabold text-ink">📈 {t(lang, "bizTrends")}</h3>
+        <ul className="mt-4 space-y-3">
+          {snap.trends.map((tr, i) => {
             const up = tr.direction === "up";
             return (
-              <li key={tr.id} className="flex items-center gap-3 rounded-2xl bg-mist px-4 py-3">
-                <span className={`text-xl ${up ? "text-leafdeep" : "text-tomato"}`}>{up ? "↑" : "↓"}</span>
+              <li
+                key={`${tr.id}-${i}`}
+                className="pop-in flex items-center gap-4 rounded-3xl bg-mist px-5 py-4"
+                style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.7), 0 3px 0 #E8DCC4", animationDelay: `${i * 0.06}s` }}
+              >
+                <span
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl ${up ? "bg-leaf/15 text-leafdeep" : "bg-tomato/10 text-tomato"}`}
+                  style={{ boxShadow: "0 3px 0 rgba(0,0,0,.06)" }}
+                >
+                  {up ? "↑" : "↓"}
+                </span>
                 <div>
-                  <p className={`text-sm font-bold ${up ? "text-leafdeep" : "text-tomato"}`}>
+                  <p className={`text-lg font-extrabold ${up ? "text-leafdeep" : "text-tomato"}`}>
                     {trendPhrase(lang, tr.window, tr.direction, tr.deltaPct)}
                   </p>
-                  <p className="text-xs text-cocoa">
+                  <p className="text-sm font-semibold text-cocoa">
                     {lang === "hi" ? "अभी" : "now"} {fmtMoney(tr.evidence.current)} ·{" "}
                     {lang === "hi" ? "पहले" : "before"} {fmtMoney(tr.evidence.baseline)}
                   </p>
@@ -91,78 +100,91 @@ export default function BusinessView() {
             );
           })}
         </ul>
+      </section>
+
+      {/* right column stack */}
+      <div className="col-span-5 space-y-6">
+        {/* anomalies */}
+        {snap.anomalies.length > 0 && (
+          <section className="card3d pop-in p-6" style={{ animationDelay: ".08s" }}>
+            <h3 className="text-xl font-extrabold text-ink">👀 {t(lang, "bizAnomalies")}</h3>
+            <ul className="mt-3 space-y-3">
+              {snap.anomalies.map((a, i) => (
+                <li
+                  key={`${a.id}-${i}`}
+                  className="rounded-3xl bg-butter px-5 py-3.5 text-base font-semibold text-ink"
+                  style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.8), 0 3px 0 #EFDCB4" }}
+                >
+                  💡 {anomalyPhrase(lang, a.description)}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* payments */}
+        <section className="card3d pop-in p-6" style={{ animationDelay: ".14s" }}>
+          <h3 className="text-xl font-extrabold text-ink">💳 {t(lang, "bizPayments")}</h3>
+          <div className="mt-4 space-y-3">
+            {snap.paymentMix.map((p) => (
+              <div key={p.method} className="flex items-center gap-3">
+                <span className="w-32 shrink-0 text-sm font-extrabold text-cocoa">
+                  {paymentLabel(lang, p.method)}
+                </span>
+                <div className="h-4 flex-1 overflow-hidden rounded-full bg-mist" style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,.08)" }}>
+                  <div
+                    className={p.method === "qr" ? "h-full rounded-full bg-sky" : p.method === "wallet" ? "h-full rounded-full bg-sun" : "h-full rounded-full bg-coral"}
+                    style={{ width: `${(p.count / totalTxs) * 100}%`, boxShadow: "inset 0 2px 0 rgba(255,255,255,.5)" }}
+                  />
+                </div>
+                <span className="w-12 text-right text-base font-extrabold text-ink">
+                  {Math.round((p.count / totalTxs) * 100)}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
 
-      {/* anomalies */}
-      {snap.anomalies.length > 0 && (
-        <div className="card">
-          <h2 className="text-lg font-extrabold text-ink">👀 {t(lang, "bizAnomalies")}</h2>
-          <ul className="mt-2 space-y-2">
-            {snap.anomalies.map((a) => (
-              <li key={a.id} className="rounded-2xl bg-butter px-4 py-3 text-sm font-semibold text-ink">
-                💡 {anomalyPhrase(lang, a.description)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       {/* customers */}
-      <div className="card">
-        <h2 className="text-lg font-extrabold text-ink">🧑‍🤝‍🧑 {t(lang, "bizCustomers")}</h2>
-        <div className="mt-2 grid grid-cols-2 gap-2">
-          {snap.segments.map((s) => (
-            <div key={s.segment} className="rounded-2xl bg-mist px-4 py-3">
-              <p className="text-xl font-extrabold text-ink">{s.count}</p>
-              <p className="text-xs font-bold text-cocoa">{segmentPhrase(lang, s.segment)}</p>
-              <p className="text-xs text-cocoa">
+      <section className="card3d pop-in col-span-7 p-6" style={{ animationDelay: ".1s" }}>
+        <h3 className="text-xl font-extrabold text-ink">🧑‍🤝‍🧑 {t(lang, "bizCustomers")}</h3>
+        <div className="mt-4 grid grid-cols-4 gap-4">
+          {snap.segments.map((s, i) => (
+            <div
+              key={`${s.segment}-${i}`}
+              className="rounded-3xl bg-mist px-4 py-4 text-center"
+              style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.7), 0 3px 0 #E8DCC4" }}
+            >
+              <p className="text-3xl font-extrabold text-ink">{s.count}</p>
+              <p className="text-xs font-extrabold text-cocoa">{segmentPhrase(lang, s.segment)}</p>
+              <p className="mt-1 text-xs font-semibold text-cocoa">
                 {fmtMoney(s.avgTicket)} {t(lang, "perVisit")}
               </p>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* payment mix */}
-      <div className="card">
-        <h2 className="text-lg font-extrabold text-ink">💳 {t(lang, "bizPayments")}</h2>
-        <div className="mt-3 space-y-2">
-          {snap.paymentMix.map((p) => (
-            <div key={p.method} className="flex items-center gap-3">
-              <span className="w-24 shrink-0 text-sm font-bold text-cocoa">
-                {paymentLabel(lang, p.method)}
-              </span>
-              <div className="h-3 flex-1 overflow-hidden rounded-full bg-mist">
-                <div
-                  className={p.method === "qr" ? "h-full rounded-full bg-sky" : p.method === "wallet" ? "h-full rounded-full bg-sun" : "h-full rounded-full bg-coral"}
-                  style={{ width: `${(p.count / totalTxs) * 100}%` }}
-                />
-              </div>
-              <span className="w-10 text-right text-sm font-extrabold text-ink">
-                {Math.round((p.count / totalTxs) * 100)}%
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+      </section>
 
       {/* memory */}
-      <div className="card">
-        <h2 className="text-lg font-extrabold text-ink">🧠 {t(lang, "bizMemory")}</h2>
-        {graphOk === false && mems.length === 0 ? (
-          <p className="mt-2 text-sm text-cocoa">{t(lang, "memoryEmpty")}</p>
-        ) : mems.length === 0 ? (
-          <p className="mt-2 text-sm text-cocoa">{t(lang, "memoryEmpty")}</p>
+      <section className="card3d pop-in col-span-5 p-6" style={{ animationDelay: ".16s" }}>
+        <h3 className="text-xl font-extrabold text-ink">🧠 {t(lang, "bizMemory")}</h3>
+        {mems.length === 0 ? (
+          <p className="mt-3 text-base font-semibold text-cocoa">{t(lang, "memoryEmpty")}</p>
         ) : (
-          <ul className="mt-2 space-y-2">
-            {mems.slice(0, 6).map((m) => (
-              <li key={m.ts} className="rounded-2xl bg-mist px-4 py-3 text-sm text-ink">
+          <ul className="mt-3 space-y-3">
+            {mems.slice(0, 5).map((m, i) => (
+              <li
+                key={`${m.ts}-${i}`}
+                className="rounded-3xl bg-mist px-5 py-3 text-sm font-semibold text-ink"
+                style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.7), 0 3px 0 #E8DCC4" }}
+              >
                 {memToPlain(m, lang)}
               </li>
             ))}
           </ul>
         )}
-      </div>
+      </section>
     </div>
   );
 }

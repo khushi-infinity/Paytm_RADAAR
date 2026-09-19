@@ -149,10 +149,16 @@ export default function MiniRadar({ blips }: { blips: MiniBlip[] }) {
   }, []);
 
   return (
-    <div className="relative">
-      <canvas ref={canvasRef} className="w-full rounded-3xl" style={{ height: 240 }} />
-      <div className="absolute bottom-2 left-0 right-0 text-center">
-        <span className="chip bg-white/80 text-cocoa">✨ {t(lang, "radarHint")}</span>
+    <div
+      className="relative rounded-[1.8rem]"
+      style={{
+        boxShadow: "inset 0 4px 12px rgba(150,120,70,.18), 0 2px 0 rgba(255,255,255,.7)",
+        background: "linear-gradient(160deg,#FFFDF6,#FBF0DC)",
+      }}
+    >
+      <canvas ref={canvasRef} className="w-full rounded-[1.8rem]" style={{ height: 320 }} />
+      <div className="absolute bottom-3 left-0 right-0 text-center">
+        <span className="chip3d bg-white/85 text-cocoa">✨ {t(lang, "radarHint")}</span>
       </div>
     </div>
   );

@@ -153,97 +153,131 @@ export default function ChatView() {
     lang === "hi"
       ? "नमस्ते! मैं RADAAR हूँ। अपनी दुकान के बारे में कुछ भी पूछिए — बिक्री, ग्राहक, ऑफ़र। 👋"
       : "Namaste! I'm RADAAR. Ask me anything about your shop — sales, customers, offers. 👋";
-  const greetingShown = messages.length > 0 || true; // greeting is always first
+
+  const status = listening
+    ? `🎙️ ${t(lang, "chatListening")}`
+    : transcribing
+      ? `✍️ ${lang === "hi" ? "लिख रहा हूँ…" : "Writing…"}`
+      : busy
+        ? `💭 ${t(lang, "chatThinking")}`
+        : speaking
+          ? `🔊 ${t(lang, "chatSpeaking")}`
+          : null;
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="px-4 pt-1">
-        <h2 className="text-xl font-extrabold text-ink">{t(lang, "chatTitle")}</h2>
-        <p className="text-sm text-cocoa">{t(lang, "chatHint")}</p>
-        <button
-          onClick={() => setVoiceOn((v) => !v)}
-          className="chip mt-2 bg-white text-cocoa shadow-soft"
-        >
-          {voiceOn
-            ? lang === "hi" ? "🔊 आवाज़ चालू" : "🔊 Voice on"
-            : lang === "hi" ? "🔇 आवाज़ बंद" : "🔇 Voice off"}
-        </button>
-      </div>
-
-      <div ref={listRef} className="mt-3 flex-1 space-y-3 overflow-y-auto px-4 pb-3">
-        {greetingShown && messages.length === 0 && (
-          <Bubble text={hello} source="hello" lang={lang} />
-        )}
-        {messages.map((m, i) => (
-          <Bubble key={i} text={m.text} source={m.source} lang={lang} />
-        ))}
-        {(busy || listening || transcribing || speaking) && (
-          <div className="flex justify-start">
-            <div className="rounded-3xl rounded-bl-lg bg-white px-4 py-3 shadow-soft">
-              <span className="text-sm font-semibold text-cocoa">
-                {listening
-                  ? `🎙️ ${t(lang, "chatListening")}`
-                  : transcribing
-                    ? `✍️ ${lang === "hi" ? "लिख रहा हूँ…" : "Writing…"}`
-                    : busy
-                      ? `💭 ${t(lang, "chatThinking")}`
-                      : `🔊 ${t(lang, "chatSpeaking")}`}
-              </span>
-            </div>
+    <div className="grid grid-cols-12 gap-6 pb-4">
+      {/* chat panel */}
+      <section className="card3d pop-in col-span-8 flex h-[72vh] flex-col p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-2xl font-extrabold text-ink">💬 {t(lang, "chatTitle")}</h3>
+            <p className="text-sm font-bold text-cocoa">{t(lang, "chatHint")}</p>
           </div>
-        )}
-      </div>
-
-      <div className="px-4 pb-4">
-        <div className="mb-2 flex flex-wrap gap-2">
-          {chips.map((c) => (
-            <button
-              key={c}
-              onClick={() => void send(c)}
-              className="chip bg-white text-skydeep shadow-soft hover:bg-mist"
-            >
-              {c}
-            </button>
-          ))}
+          <button
+            onClick={() => setVoiceOn((v) => !v)}
+            className="chip3d bg-mist text-cocoa hover:bg-white"
+          >
+            {voiceOn
+              ? lang === "hi" ? "🔊 आवाज़ चालू" : "🔊 Voice on"
+              : lang === "hi" ? "🔇 आवाज़ बंद" : "🔇 Voice off"}
+          </button>
         </div>
-        {micError && <p className="mb-2 text-sm font-semibold text-tomato">{micError}</p>}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void send(input);
-          }}
-          className="flex items-center gap-2"
-        >
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={t(lang, "chatPlaceholder")}
-            className="min-w-0 flex-1 rounded-full border-2 border-mist bg-white px-5 py-3 text-base text-ink placeholder:text-cocoa/60 focus:border-sky focus:outline-none"
-          />
-          <button
-            type="button"
-            onClick={() => (listening ? stopListening() : void startListening())}
-            disabled={transcribing}
-            className={`flex h-13 w-13 shrink-0 items-center justify-center rounded-full p-3.5 text-xl transition-all ${
-              listening ? "animate-pulse bg-tomato text-white shadow-pop" : "bg-sky text-white hover:bg-skydeep"
-            }`}
-            aria-label={t(lang, "chatMic")}
+
+        <div ref={listRef} className="mt-4 flex-1 space-y-4 overflow-y-auto pr-2">
+          {messages.length === 0 && !busy && <Bubble text={hello} source="hello" lang={lang} />}
+          {messages.map((m, i) => (
+            <Bubble key={i} text={m.text} source={m.source} lang={lang} />
+          ))}
+          {status && (
+            <div className="flex justify-start">
+              <div
+                className="rounded-[1.6rem] rounded-bl-lg bg-white px-5 py-3 text-base font-bold text-cocoa"
+                style={{ boxShadow: "0 3px 0 #F3E3C6, 0 10px 20px rgba(196,158,96,.2)" }}
+              >
+                {status}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 border-t-2 border-mist pt-4">
+          <div className="mb-3 flex flex-wrap gap-2">
+            {chips.map((c) => (
+              <button
+                key={c}
+                onClick={() => void send(c)}
+                className="chip3d bg-mist text-skydeep hover:bg-butter"
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+          {micError && <p className="mb-2 text-sm font-extrabold text-tomato">{micError}</p>}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void send(input);
+            }}
+            className="flex items-center gap-3"
           >
-            {transcribing ? (
-              <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-            ) : (
-              "🎙️"
-            )}
-          </button>
-          <button
-            type="submit"
-            disabled={busy || !input.trim()}
-            className="big-btn-primary !px-5 !py-3 disabled:opacity-40"
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={t(lang, "chatPlaceholder")}
+              className="min-w-0 flex-1 rounded-full border-2 border-mist bg-cream/60 px-6 py-3.5 text-lg text-ink placeholder:text-cocoa/60 focus:border-sky focus:outline-none"
+              style={{ boxShadow: "inset 0 2px 6px rgba(0,0,0,.05)" }}
+            />
+            <button
+              type="button"
+              onClick={() => (listening ? stopListening() : void startListening())}
+              disabled={transcribing}
+              className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl transition-all ${
+                listening ? "animate-pulse btn3d btn3d-tomato !p-0" : "btn3d btn3d-sky !p-0"
+              }`}
+              aria-label={t(lang, "chatMic")}
+            >
+              {transcribing ? (
+                <span className="h-6 w-6 animate-spin rounded-full border-[3px] border-white/40 border-t-white" />
+              ) : (
+                "🎙️"
+              )}
+            </button>
+            <button type="submit" disabled={busy || !input.trim()} className="btn3d btn3d-tomato !px-6 !disabled:opacity-40">
+              ➤
+            </button>
+          </form>
+        </div>
+      </section>
+
+      {/* side rail: how it works, friendly */}
+      <aside className="col-span-4 space-y-6">
+        <section className="card3d pop-in p-6 text-center" style={{ animationDelay: ".1s" }}>
+          <div
+            className="floaty mx-auto flex h-24 w-24 items-center justify-center rounded-[1.8rem] bg-sky/15 text-5xl"
+            style={{ boxShadow: "inset 0 3px 0 rgba(255,255,255,.8), 0 6px 0 #D8E8F5, 0 14px 28px rgba(61,155,233,.25)" }}
           >
-            ➤
-          </button>
-        </form>
-      </div>
+            🎙️
+          </div>
+          <p className="mt-4 text-lg font-extrabold text-ink">
+            {lang === "hi" ? "बोलकर पूछें" : "Just ask out loud"}
+          </p>
+          <p className="mt-1 text-sm font-semibold text-cocoa">
+            {lang === "hi"
+              ? "हिंदी, अंग्रेज़ी या हिंग्लिश — जैसे दुकान पर बोलते हैं। RADAAR सुनेगा, समझेगा, और बोलकर जवाब देगा।"
+              : "Hindi, English or Hinglish — however you talk at the shop. RADAAR listens, understands, and answers out loud."}
+          </p>
+        </section>
+        <section className="card3d pop-in p-6" style={{ animationDelay: ".18s" }}>
+          <p className="text-sm font-extrabold text-cocoa">
+            🧠 {lang === "hi" ? "जवाब कहाँ से आते हैं?" : "Where answers come from"}
+          </p>
+          <p className="mt-2 text-sm font-semibold text-cocoa">
+            {lang === "hi"
+              ? "हर जवाब आपके ही व्यापार की स्मृति (memory graph) से आता है — RADAAR कुछ भी अंदाज़े से नहीं कहता।"
+              : "Every answer is retrieved from your own business memory graph — RADAAR never guesses."}
+          </p>
+        </section>
+      </aside>
     </div>
   );
 }
@@ -253,18 +287,21 @@ function Bubble({ text, source, lang }: { text: string; source?: string; lang: "
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[85%] whitespace-pre-wrap px-4 py-3 text-base leading-relaxed ${
-          isUser
-            ? "rounded-3xl rounded-br-lg bg-sky text-white"
-            : "rounded-3xl rounded-bl-lg bg-white text-ink shadow-soft"
+        className={`max-w-[80%] whitespace-pre-wrap px-5 py-3.5 text-lg leading-relaxed ${
+          isUser ? "rounded-[1.6rem] rounded-br-lg text-white" : "rounded-[1.6rem] rounded-bl-lg bg-white text-ink"
         }`}
+        style={
+          isUser
+            ? { background: "linear-gradient(145deg,#4AA5EC,#2C7CC0)", boxShadow: "0 4px 0 #2C7CC0, 0 12px 22px rgba(61,155,233,.3)" }
+            : { boxShadow: "0 3px 0 #F3E3C6, 0 10px 20px rgba(196,158,96,.2)" }
+        }
       >
         {text}
         {source === "memory-graph" && (
-          <span className="mt-1 block text-xs font-bold text-leafdeep">● {t(lang, "chatGrounded")}</span>
+          <span className="mt-1 block text-sm font-extrabold text-leafdeep">● {t(lang, "chatGrounded")}</span>
         )}
         {source === "live-snapshot" && (
-          <span className="mt-1 block text-xs font-bold text-sun">{t(lang, "chatFallback")}</span>
+          <span className="mt-1 block text-sm font-extrabold text-sun">{t(lang, "chatFallback")}</span>
         )}
       </div>
     </div>
