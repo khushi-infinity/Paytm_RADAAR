@@ -192,7 +192,7 @@ export default function ChatView() {
             <div className="flex justify-start">
               <div
                 className="rounded-[1.6rem] rounded-bl-lg bg-white px-5 py-3 text-base font-bold text-cocoa"
-                style={{ boxShadow: "0 3px 0 #F3E3C6, 0 10px 20px rgba(196,158,96,.2)" }}
+                style={{ boxShadow: "0 3px 0 #C9D9F6, 0 10px 20px rgba(16,52,128,.15)" }}
               >
                 {status}
               </div>
@@ -206,7 +206,7 @@ export default function ChatView() {
               <button
                 key={c}
                 onClick={() => void send(c)}
-                className="chip3d bg-mist text-skydeep hover:bg-butter"
+                className="chip3d bg-bluemist text-skydeep hover:bg-white"
               >
                 {c}
               </button>
@@ -224,15 +224,15 @@ export default function ChatView() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={t(lang, "chatPlaceholder")}
-              className="min-w-0 flex-1 rounded-full border-2 border-mist bg-cream/60 px-6 py-3.5 text-lg text-ink placeholder:text-cocoa/60 focus:border-sky focus:outline-none"
-              style={{ boxShadow: "inset 0 2px 6px rgba(0,0,0,.05)" }}
+              className="min-w-0 flex-1 rounded-full border-2 border-bluemist bg-bluemist/60 px-6 py-3.5 text-lg text-ink placeholder:text-cocoa/60 focus:border-skybright focus:outline-none"
+              style={{ boxShadow: "inset 0 2px 6px rgba(16,52,128,.08)" }}
             />
             <button
               type="button"
               onClick={() => (listening ? stopListening() : void startListening())}
               disabled={transcribing}
               className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl transition-all ${
-                listening ? "animate-pulse btn3d btn3d-tomato !p-0" : "btn3d btn3d-sky !p-0"
+                listening ? "animate-pulse btn3d btn3d-orange !p-0" : "btn3d btn3d-sky !p-0"
               }`}
               aria-label={t(lang, "chatMic")}
             >
@@ -242,7 +242,7 @@ export default function ChatView() {
                 "🎙️"
               )}
             </button>
-            <button type="submit" disabled={busy || !input.trim()} className="btn3d btn3d-tomato !px-6 !disabled:opacity-40">
+            <button type="submit" disabled={busy || !input.trim()} className="btn3d btn3d-orange !px-6 !disabled:opacity-40">
               ➤
             </button>
           </form>
@@ -253,8 +253,8 @@ export default function ChatView() {
       <aside className="col-span-4 space-y-6">
         <section className="card3d pop-in p-6 text-center" style={{ animationDelay: ".1s" }}>
           <div
-            className="floaty mx-auto flex h-24 w-24 items-center justify-center rounded-[1.8rem] bg-sky/15 text-5xl"
-            style={{ boxShadow: "inset 0 3px 0 rgba(255,255,255,.8), 0 6px 0 #D8E8F5, 0 14px 28px rgba(61,155,233,.25)" }}
+            className="floaty mx-auto flex h-24 w-24 items-center justify-center rounded-[1.8rem] bg-sky/10 text-5xl"
+            style={{ boxShadow: "inset 0 3px 0 rgba(255,255,255,.9), 0 6px 0 #C9D9F6, 0 14px 28px rgba(16,52,128,.2)" }}
           >
             🎙️
           </div>
@@ -292,16 +292,16 @@ function Bubble({ text, source, lang }: { text: string; source?: string; lang: "
         }`}
         style={
           isUser
-            ? { background: "linear-gradient(145deg,#4AA5EC,#2C7CC0)", boxShadow: "0 4px 0 #2C7CC0, 0 12px 22px rgba(61,155,233,.3)" }
-            : { boxShadow: "0 3px 0 #F3E3C6, 0 10px 20px rgba(196,158,96,.2)" }
+            ? { background: "linear-gradient(145deg,#4A7EF0,#2C63D9)", boxShadow: "0 4px 0 #2C63D9, 0 12px 22px rgba(9,34,84,.3)" }
+            : { boxShadow: "0 3px 0 #C9D9F6, 0 10px 20px rgba(16,52,128,.15)" }
         }
       >
         {text}
         {source === "memory-graph" && (
-          <span className="mt-1 block text-sm font-extrabold text-leafdeep">● {t(lang, "chatGrounded")}</span>
+          <span className="mt-1 block text-sm font-extrabold text-leafdeep">🧠 {t(lang, "cogneeBadge")}</span>
         )}
         {source === "live-snapshot" && (
-          <span className="mt-1 block text-sm font-extrabold text-sun">{t(lang, "chatFallback")}</span>
+          <span className="mt-1 block text-sm font-extrabold text-sun">📊 {t(lang, "snapshotBadge")}</span>
         )}
       </div>
     </div>

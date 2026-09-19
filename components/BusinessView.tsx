@@ -78,12 +78,12 @@ export default function BusinessView() {
             return (
               <li
                 key={`${tr.id}-${i}`}
-                className="pop-in flex items-center gap-4 rounded-3xl bg-mist px-5 py-4"
-                style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.7), 0 3px 0 #E8DCC4", animationDelay: `${i * 0.06}s` }}
+                className="pop-in flex items-center gap-4 rounded-3xl bg-bluemist px-5 py-4"
+                style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.9), 0 3px 0 #C9D9F6", animationDelay: `${i * 0.06}s` }}
               >
                 <span
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl ${up ? "bg-leaf/15 text-leafdeep" : "bg-tomato/10 text-tomato"}`}
-                  style={{ boxShadow: "0 3px 0 rgba(0,0,0,.06)" }}
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-2xl ${up ? "bg-mint/15 text-leafdeep" : "bg-tomato/10 text-tomato"}`}
+                  style={{ boxShadow: "0 3px 0 rgba(16,52,128,.08)" }}
                 >
                   {up ? "↑" : "↓"}
                 </span>
@@ -113,7 +113,7 @@ export default function BusinessView() {
                 <li
                   key={`${a.id}-${i}`}
                   className="rounded-3xl bg-butter px-5 py-3.5 text-base font-semibold text-ink"
-                  style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.8), 0 3px 0 #EFDCB4" }}
+                  style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.9), 0 3px 0 #EFDCB4" }}
                 >
                   💡 {anomalyPhrase(lang, a.description)}
                 </li>
@@ -131,9 +131,9 @@ export default function BusinessView() {
                 <span className="w-32 shrink-0 text-sm font-extrabold text-cocoa">
                   {paymentLabel(lang, p.method)}
                 </span>
-                <div className="h-4 flex-1 overflow-hidden rounded-full bg-mist" style={{ boxShadow: "inset 0 2px 4px rgba(0,0,0,.08)" }}>
+                <div className="h-4 flex-1 overflow-hidden rounded-full bg-bluemist" style={{ boxShadow: "inset 0 2px 4px rgba(16,52,128,.10)" }}>
                   <div
-                    className={p.method === "qr" ? "h-full rounded-full bg-sky" : p.method === "wallet" ? "h-full rounded-full bg-sun" : "h-full rounded-full bg-coral"}
+                    className={p.method === "qr" ? "h-full rounded-full bg-skybright" : p.method === "wallet" ? "h-full rounded-full bg-sun" : "h-full rounded-full bg-orange"}
                     style={{ width: `${(p.count / totalTxs) * 100}%`, boxShadow: "inset 0 2px 0 rgba(255,255,255,.5)" }}
                   />
                 </div>
@@ -153,8 +153,8 @@ export default function BusinessView() {
           {snap.segments.map((s, i) => (
             <div
               key={`${s.segment}-${i}`}
-              className="rounded-3xl bg-mist px-4 py-4 text-center"
-              style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.7), 0 3px 0 #E8DCC4" }}
+              className="rounded-3xl bg-bluemist px-4 py-4 text-center"
+              style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.9), 0 3px 0 #C9D9F6" }}
             >
               <p className="text-3xl font-extrabold text-ink">{s.count}</p>
               <p className="text-xs font-extrabold text-cocoa">{segmentPhrase(lang, s.segment)}</p>
@@ -176,9 +176,10 @@ export default function BusinessView() {
             {mems.slice(0, 5).map((m, i) => (
               <li
                 key={`${m.ts}-${i}`}
-                className="rounded-3xl bg-mist px-5 py-3 text-sm font-semibold text-ink"
-                style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.7), 0 3px 0 #E8DCC4" }}
+                className="rounded-3xl bg-bluemist px-5 py-3 text-sm font-semibold text-ink"
+                style={{ boxShadow: "inset 0 2px 0 rgba(255,255,255,.9), 0 3px 0 #C9D9F6" }}
               >
+                <span className="mr-1 text-xs font-extrabold text-royal">🧠</span>
                 {memToPlain(m, lang)}
               </li>
             ))}

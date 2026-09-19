@@ -7,97 +7,118 @@
 }
 
 body {
-  @apply bg-cream text-ink antialiased;
+  @apply text-white antialiased;
   font-family: "Baloo 2", ui-rounded, "Quicksand", system-ui, sans-serif;
-  /* soft-3D sky: layered light sources give the scene depth before anything renders */
+  /* trust-blue canvas, lit from top-left like the reference */
   background-image:
-    radial-gradient(ellipse 55% 45% at 80% -10%, rgba(255, 193, 94, 0.30), transparent),
-    radial-gradient(ellipse 45% 40% at 8% 105%, rgba(255, 138, 101, 0.16), transparent),
-    radial-gradient(ellipse 40% 35% at 95% 80%, rgba(61, 155, 233, 0.12), transparent),
-    linear-gradient(180deg, #FFFDF7 0%, #FDF6E9 45%, #FBEEDB 100%);
+    radial-gradient(115% 85% at 12% -5%, #63A0FF 0%, #3D82F5 42%, #2C68E4 100%);
   background-attachment: fixed;
 }
 
 @layer components {
-  /* puffy 3D card: raised face, inner top-light, deep soft shadow below */
+  /* clay card on blue: white face, cool inner top light, deep blue drop */
   .card3d {
-    @apply relative rounded-[2rem] bg-white;
+    @apply relative rounded-[2rem] bg-white text-ink;
     box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -3px 6px rgba(190, 160, 110, 0.10),
-      0 2px 0 #F3E3C6,
-      0 10px 24px rgba(196, 158, 96, 0.20),
-      0 24px 48px rgba(196, 158, 96, 0.14);
+      inset 0 3px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -4px 8px rgba(30, 80, 180, 0.08),
+      0 3px 0 #D9E6FB,
+      0 14px 30px rgba(16, 52, 128, 0.30),
+      0 30px 60px rgba(16, 52, 128, 0.20);
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
   }
   .card3d-hover:hover {
     transform: translateY(-4px) scale(1.01);
     box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -3px 6px rgba(190, 160, 110, 0.10),
-      0 4px 0 #F3E3C6,
-      0 16px 32px rgba(196, 158, 96, 0.24),
-      0 32px 64px rgba(196, 158, 96, 0.16);
+      inset 0 3px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -4px 8px rgba(30, 80, 180, 0.08),
+      0 5px 0 #D9E6FB,
+      0 20px 40px rgba(16, 52, 128, 0.34),
+      0 40px 72px rgba(16, 52, 128, 0.22);
   }
 
-  /* chunky 3D button: a pill sitting on its own extruded base */
+  /* navy variant for panels that sit directly on blue */
+  .card3d-deep {
+    @apply relative rounded-[2rem] text-white;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.07));
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -4px 10px rgba(20, 60, 150, 0.25),
+      0 14px 34px rgba(10, 40, 100, 0.35);
+    backdrop-filter: blur(8px);
+  }
+
+  /* chunky 3D button with press physics */
   .btn3d {
     @apply relative inline-flex items-center justify-center gap-2 rounded-full font-extrabold text-white;
     padding: 0.85rem 2rem;
     box-shadow:
       inset 0 2px 0 rgba(255, 255, 255, 0.35),
-      0 5px 0 var(--btn-base, #C9442D),
-      0 12px 22px rgba(0, 0, 0, 0.18);
+      0 5px 0 var(--btn-base, #E0512F),
+      0 12px 24px rgba(9, 34, 84, 0.35);
     transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
   }
-  .btn3d:hover { filter: brightness(1.06); }
+  .btn3d:hover { filter: brightness(1.07); }
   .btn3d:active {
     transform: translateY(4px);
     box-shadow:
       inset 0 2px 0 rgba(255, 255, 255, 0.35),
-      0 1px 0 var(--btn-base, #C9442D),
-      0 4px 10px rgba(0, 0, 0, 0.16);
+      0 1px 0 var(--btn-base, #E0512F),
+      0 4px 10px rgba(9, 34, 84, 0.3);
   }
-  .btn3d-tomato { @apply bg-tomato; --btn-base: #C9442D; }
-  .btn3d-leaf { @apply bg-leaf; --btn-base: #2E8F5D; }
-  .btn3d-sky { @apply bg-sky; --btn-base: #2C7CC0; }
+  .btn3d-orange { @apply bg-orange; --btn-base: #D14A25; }
+  .btn3d-leaf { @apply bg-mint; --btn-base: #2FA374; }
+  .btn3d-sky { @apply bg-skybright; --btn-base: #2C63D9; }
+  .btn3d-white { @apply bg-white text-royal; --btn-base: #D9E6FB; }
 
   .chip3d {
     @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-bold;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      0 2px 0 rgba(214, 186, 134, 0.5),
-      0 4px 8px rgba(196, 158, 96, 0.12);
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      0 2px 0 rgba(150, 180, 230, 0.45),
+      0 5px 10px rgba(9, 34, 84, 0.18);
+  }
+  .chip3d-deep {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-bold text-white;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      0 4px 10px rgba(9, 34, 84, 0.22);
   }
 
-  /* tab bar items as little 3D stones */
+  /* tab stones */
   .tabstone {
-    @apply flex-1 flex flex-col items-center gap-0.5 rounded-2xl px-2 py-2.5 text-sm font-extrabold text-cocoa;
-    transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    @apply flex-1 flex flex-col items-center gap-0.5 rounded-2xl px-2 py-2.5 text-sm font-extrabold transition-all;
+    color: #CFE0FB;
   }
   .tabstone[data-active="true"] {
-    @apply bg-white text-tomato;
+    @apply bg-white text-royal;
     transform: translateY(-6px);
     box-shadow:
       inset 0 2px 0 rgba(255, 255, 255, 0.9),
-      0 4px 0 #F3E3C6,
-      0 14px 26px rgba(196, 158, 96, 0.28);
+      0 4px 0 #D9E6FB,
+      0 16px 30px rgba(9, 34, 84, 0.4);
   }
 }
 
 * { -webkit-tap-highlight-color: transparent; }
 
-/* gentle float for decorative 3D elements */
 @keyframes floaty {
   0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
-  50% { transform: translateY(-10px) rotate(var(--rot, 0deg)); }
+  50% { transform: translateY(-12px) rotate(var(--rot, 0deg)); }
 }
-.floaty { animation: floaty 5s ease-in-out infinite; }
-.floaty-slow { animation: floaty 7s ease-in-out infinite; }
+.floaty { animation: floaty 5.5s ease-in-out infinite; }
+.floaty-slow { animation: floaty 8s ease-in-out infinite; }
 
-/* dashboard entrance */
 @keyframes pop-in {
-  0% { opacity: 0; transform: translateY(14px) scale(0.98); }
+  0% { opacity: 0; transform: translateY(16px) scale(0.97); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
-.pop-in { animation: pop-in 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) both; }
+.pop-in { animation: pop-in 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) both; }
+
+/* mascot idle bob */
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+.mascot-bob { animation: bob 4.5s ease-in-out infinite; transform-origin: 50% 90%; }

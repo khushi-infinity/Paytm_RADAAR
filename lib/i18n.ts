@@ -106,6 +106,35 @@ export const STR = {
 
   // Misc
   perVisit: { en: "per visit", hi: "प्रति विज़िट" },
+
+  // The visible AI pipeline (answers "where are n8n and Cognee used?")
+  stepAi: { en: "AI suggests", hi: "AI सुझाव देता है" },
+  stepN8n: { en: "n8n runs it", hi: "n8n चलाता है" },
+  stepCognee: { en: "Cognee remembers", hi: "Cognee याद रखता है" },
+  pipelineIdle: {
+    en: "RADAAR's AI picked this for you",
+    hi: "RADAAR की AI ने यह आपके लिए चुना",
+  },
+  pipelineSending: {
+    en: "Your n8n workflow is running…",
+    hi: "आपका n8n वर्कफ़्लो चल रहा है…",
+  },
+  pipelineSent: {
+    en: "Done! Saved to your Cognee memory.",
+    hi: "हो गया! आपकी Cognee स्मृति में सेव हो गया।",
+  },
+  seeLive: { en: "See it live in your n8n", hi: "इसे अपने n8n में लाइव देखें" },
+  pipelineNote: {
+    en: "Every step runs in YOUR n8n, saved in YOUR Cognee memory.",
+    hi: "हर कदम आपके अपने n8n में चलता है, आपकी Cognee स्मृति में सेव होता है।",
+  },
+  cogneeBadge: { en: "from Cognee memory", hi: "Cognee स्मृति से" },
+  snapshotBadge: { en: "from today's numbers", hi: "आज के आँकड़ों से" },
+  mascotName: { en: "DADA", hi: "दादा" },
+  mascotFocus: {
+    en: "I'm DADA! Here's today's focus.",
+    hi: "मैं हूँ दादा! आज का फोकस यह है।",
+  },
   newThisWeek: { en: "new this week", hi: "इस हफ़्ते नए" },
   total: { en: "total", hi: "कुल" },
   loading: { en: "Setting up your shop view…", hi: "आपकी दुकान का व्यू तैयार हो रहा है…" },

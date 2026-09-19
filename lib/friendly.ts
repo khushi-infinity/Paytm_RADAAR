@@ -56,6 +56,11 @@ function angleFor(id: string): number {
   return ((h >>> 0) % 360);
 }
 
+/** The user asked for no em dashes anywhere in the UI. */
+export function noDash(s: string): string {
+  return s.replace(/\s*—\s*/g, ", ").replace(/\s+,/g, ",");
+}
+
 /**
  * Build language-aware views of every card. English reuses the engine's own
  * sentences; Hindi mirrors the same template with the same numbers (lib/hi.ts).
@@ -77,15 +82,15 @@ export function cardViews(snap: BusinessSnapshot, lang: Lang): CardView[] {
       signal:
         lang === "hi" && o
           ? cardSignalHi(o.id, size, id === "opp_weekday_evening" ? eveningPct : 0)
-          : c.signal,
+          : noDash(c.signal),
       why:
         lang === "hi" && o
           ? cardWhyHi(o.id, size, eveningPct, avgTicket)
-          : c.why,
+          : noDash(c.why),
       action:
         lang === "hi" && o
           ? cardActionHi(o.id)
-          : c.action,
+          : noDash(c.action),
       impactLow: o?.impactLow ?? 0,
       impactHigh: o?.impactHigh ?? 0,
       targetSize: size,
