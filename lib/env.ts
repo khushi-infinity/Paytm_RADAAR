@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import path from "node:path";
 
 let loaded = false;
 
@@ -7,13 +8,17 @@ export function loadEnv(): void {
   if (loaded) return;
   loaded = true;
   try {
-    const text = readFileSync(new URL("../.env", import.meta.url), "utf8");
+    // resolved from the process working directory (project root), NOT
+    // import.meta.url: a URL-based reference makes bundlers treat .env as a
+    // build-time dependency and fail the build when the file is absent
+    // (e.g. Railway, where secrets come from platform Variables).
+    const text = readFileSync(path.join(process.cwd(), ".env"), "utf8");
     for (const line of text.split("\n")) {
       const m = line.match(/^([A-Z0-9_]+)=(.*)\s*$/);
       if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2];
     }
   } catch {
-    // .env optional if vars are exported in the shell
+    // .env optional if vars are exported in the shell or set by the platform
   }
 }
 

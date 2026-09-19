@@ -13,6 +13,7 @@
  */
 
 import { readFileSync } from "node:fs";
+import path from "node:path";
 import { generateMerchantData } from "./generator";
 import { buildSnapshot } from "./insights";
 import { allWorkflows, bakeEnv } from "./n8n-workflows";
@@ -23,7 +24,7 @@ import { generateNudgeHinglish } from "./sarvam";
 // Minimal .env loader so `npm run pipeline` needs no shell setup
 function loadDotEnv(): void {
   try {
-    const text = readFileSync(new URL("../.env", import.meta.url), "utf8");
+    const text = readFileSync(path.join(process.cwd(), ".env"), "utf8");
     for (const line of text.split("\n")) {
       const m = line.match(/^([A-Z0-9_]+)=(.*)\s*$/);
       if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2];
