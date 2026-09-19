@@ -5,7 +5,7 @@ const DAY = 86_400_000;
 // ─── Trend detection ────────────────────────────────────────────────────────
 
 export interface HourCell {
-  date: string; // YYYY-MM-DD — one cell per calendar day, so averages are
+  date: string; // YYYY-MM-DD, one cell per calendar day, so averages are
   // per-occurrence and comparable across windows of different lengths
   dow: number; // 0=Sun
   hour: number;
@@ -39,14 +39,14 @@ function avgRevenue(cells: HourCell[], filter: (c: HourCell) => boolean): number
 
 export function detectTrends(txs: Transaction[], customers: Customer[], now: number): Trend[] {
   // Operational view: exclude one-off whale transactions (≥ ₹10K) from trend
-  // math — they're surfaced separately by the anomaly detector.
+  // math, they're surfaced separately by the anomaly detector.
   const ops = txs.filter((t) => t.amount < 10_000);
   const recent = buildHourCells(ops.filter((t) => t.ts > now - 21 * DAY), 21, now);
-  // baseline: 25–63 days ago, starts at 25 to stay clear of the festive window
+  // baseline: 25-63 days ago, starts at 25 to stay clear of the festive window
   const baseline = buildHourCells(ops.filter((t) => t.ts <= now - 25 * DAY && t.ts > now - 63 * DAY), 38, now);
   const trends: Trend[] = [];
 
-  // Hero scenario: weekday evenings (17–20) vs weekend evenings
+  // Hero scenario: weekday evenings (17-20) vs weekend evenings
   const recentWkEv = avgRevenue(recent, (c) => c.dow >= 1 && c.dow <= 5 && c.hour >= 17 && c.hour <= 20);
   const baseWkEv = avgRevenue(baseline, (c) => c.dow >= 1 && c.dow <= 5 && c.hour >= 17 && c.hour <= 20);
   if (baseWkEv > 0) {
@@ -55,10 +55,10 @@ export function detectTrends(txs: Transaction[], customers: Customer[], now: num
       trends.push({
         id: "trend_weekday_evening",
         metric: "revenue",
-        window: "weekday evenings (5–8 PM)",
+        window: "weekday evenings (5-8 PM)",
         direction: deltaPct < 0 ? "down" : "up",
         deltaPct: Math.round(deltaPct * 10) / 10,
-        baselineLabel: "pre-taper weekday baseline (weeks 3–9)",
+        baselineLabel: "pre-taper weekday baseline (weeks 3-9)",
         evidence: { current: Math.round(recentWkEv), baseline: Math.round(baseWkEv), sampleSize: recent.filter((c) => c.dow >= 1 && c.dow <= 5 && c.hour >= 17 && c.hour <= 20).length },
       });
     }
@@ -138,7 +138,7 @@ export function detectAnomalies(txs: Transaction[], now: number): Anomaly[] {
   }
   for (const group of buckets.values()) {
     if (group.length < 8) continue;
-    // ordinary small tickets don't count as "similar bursts" — real duplicate
+    // ordinary small tickets don't count as "similar bursts", real duplicate
     // charges / refund waves involve non-trivial amounts
     if (Math.min(...group.map((t) => t.amount)) < 500) continue;
     const sorted = [...group].sort((a, b) => a.ts - b.ts);
@@ -153,7 +153,7 @@ export function detectAnomalies(txs: Transaction[], now: number): Anomaly[] {
         id: `anom_burst_${window8[0].id}`,
         ts: window8[0].ts,
         kind: "duplicate_pattern",
-        description: `${window8.length} similar ₹${lo.toLocaleString("en-IN")}+ transactions within 2 hours — possible duplicate charges or refund wave`,
+        description: `${window8.length} similar ₹${lo.toLocaleString("en-IN")}+ transactions within 2 hours, possible duplicate charges or refund wave`,
         amount: amounts.reduce((s, a) => s + a, 0),
         zScore: group.length,
       });
@@ -192,10 +192,10 @@ export function detectAnomalies(txs: Transaction[], now: number): Anomaly[] {
 export function computeSegments(customers: Customer[], now: number): SegmentStats[] {
   const segments: SegmentStats[] = [];
   const defs: { seg: Customer["segment"]; desc: string }[] = [
-    { seg: "regular", desc: "Visit 6+ times — your core earners" },
-    { seg: "new", desc: "First-time or rare visitors — nurture them" },
+    { seg: "regular", desc: "Visit 6+ times, your core earners" },
+    { seg: "new", desc: "First-time or rare visitors, nurture them" },
     { seg: "at_risk", desc: "Were regular, haven't visited in 2+ weeks" },
-    { seg: "inactive", desc: "Gone quiet for 4+ weeks — win them back" },
+    { seg: "inactive", desc: "Gone quiet for 4+ weeks, win them back" },
   ];
   const real = customers.filter((c) => c.visitCount > 0); // never-transacted customers don't count
   for (const { seg, desc } of defs) {

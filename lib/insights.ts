@@ -48,7 +48,7 @@ function buildOpportunities(
       id: "opp_reactivate",
       type: "reactivate_inactive",
       title: `Re-engage ${inactive.length} inactive customers`,
-      why: `These customers averaged ${inr(avgTicket)} per visit before going quiet. A win-back nudge targets ${inactive.length} people whose own history suggests they would return — modeled at a conservative 6–12% return rate.`,
+      why: `These customers averaged ${inr(avgTicket)} per visit before going quiet. A win-back nudge targets ${inactive.length} people whose own history suggests they would return, modeled at a conservative 6-12% return rate.`,
       action: "Send a ₹50-off win-back nudge on WhatsApp",
       actionCta: "Create win-back offer",
       targetSize: inactive.length,
@@ -59,7 +59,7 @@ function buildOpportunities(
     });
     if (eveningTrend && eveningTrend.direction === "down") {
       // Impact computed from the merchant's OWN data: per-slot revenue gap ×
-      // weekday-evening slots, recovered at a modeled 40–60% — no baked constants.
+      // weekday-evening slots, recovered at a modeled 40-60%, no baked constants.
       const eveningRegulars = customers.filter(
         (c) => c.isWeekdayEveningRegular && c.segment !== "inactive",
       ).length;
@@ -68,9 +68,9 @@ function buildOpportunities(
       opportunities.push({
         id: "opp_weekday_evening",
         type: "weekday_evening_offer",
-        title: "Launch a 5–8 PM weekday offer",
-        why: `Your 5–8 PM regulars (${eveningRegulars} customers) are visiting less on weekdays — evening revenue is running ${Math.abs(eveningTrend.deltaPct)}% below your own pre-taper baseline. An evening offer targets exactly the slot that slipped.`,
-        action: "Create a 5–8 PM weekday evening offer (e.g. ₹30 off above ₹200)",
+        title: "Launch a 5-8 PM weekday offer",
+        why: `Your 5-8 PM regulars (${eveningRegulars} customers) are visiting less on weekdays, evening revenue is running ${Math.abs(eveningTrend.deltaPct)}% below your own pre-taper baseline. An evening offer targets exactly the slot that slipped.`,
+        action: "Create a 5-8 PM weekday evening offer (e.g. ₹30 off above ₹200)",
         actionCta: "Create evening offer",
         targetSize: eveningRegulars,
         impactLow: Math.round(lostRevenue * 0.4),
@@ -90,7 +90,7 @@ function buildOpportunities(
       id: "opp_retention",
       type: "retention_offer",
       title: `Hold on to ${atRisk.length} slipping regulars`,
-      why: `They used to visit weekly. Re-engaging someone who already knows your store costs a fraction of finding a new customer — a personal check-in now prevents likely churn.`,
+      why: `They used to visit weekly. Re-engaging someone who already knows your store costs a fraction of finding a new customer, a personal check-in now prevents likely churn.`,
       action: "Send a personal “come back soon” message with ₹20 off next visit",
       actionCta: "Send retention nudges",
       targetSize: atRisk.length,
@@ -172,7 +172,7 @@ export function buildSnapshot(
     why: o.why,
     opportunity: o.title,
     action: o.action,
-    impact: `${inr(o.impactLow)}–${inr(o.impactHigh)} ${o.impactPeriod} (AI estimate)`,
+    impact: `${inr(o.impactLow)}-${inr(o.impactHigh)} ${o.impactPeriod} (AI estimate)`,
     ctaLabel: o.actionCta,
     linkedOpportunity: o,
   }));

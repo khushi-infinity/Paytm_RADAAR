@@ -40,8 +40,8 @@ function utcMidnight(ms: number): number {
 /**
  * Behavioral model (per day-hour cell, all times UTC day-anchored):
  *  - ~1,050 transactions/week, avg ticket ≈ ₹350 (deck-scale KPIs)
- *  - weekends ~1.5x weekday baseline; evening (17–20) is the strongest slot
- *  - festive days spike 2.2x — placed OUTSIDE all comparison windows
+ *  - weekends ~1.5x weekday baseline; evening (17-20) is the strongest slot
+ *  - festive days spike 2.2x, placed OUTSIDE all comparison windows
  *  - weekday evenings taper to ~0.62x during the LAST 21 days (hero scenario)
  *  - ~180 previously-regular customers go quiet ~30 days ago (win-back pool)
  *  - ~140 genuinely new customers trickle in over the final 35 days
@@ -93,7 +93,7 @@ export function generateMerchantData(opts: GeneratorOptions = {}): GeneratedData
     const isWeekend = dow === 0 || dow === 6;
     const daysFromEnd = days - 1 - d; // 0 = today
 
-    // Festive windows: 24–22 and 60–58 days from end (outside trend + KPI windows)
+    // Festive windows: 24-22 and 60-58 days from end (outside trend + KPI windows)
     const isFestive = (daysFromEnd >= 22 && daysFromEnd <= 24) || (daysFromEnd >= 58 && daysFromEnd <= 60);
 
     // Hero taper: last 21 days, weekday evenings weaken progressively
@@ -125,7 +125,7 @@ export function generateMerchantData(opts: GeneratorOptions = {}): GeneratedData
           cust = eveningOnes[Math.floor(rng() * eveningOnes.length)];
         }
         if (cust.inactive && dayStart >= inactiveSince && rng() < 0.97) continue;
-        if (dayStart < cust.newSince) continue; // future customer — no tx yet
+        if (dayStart < cust.newSince) continue; // future customer, no tx yet
 
         // stable amount distribution: mean ≈ ₹350, moderate tail to ~₹600
         const amount = Math.round((150 + Math.pow(rng(), 1.3) * 450) * (isFestive ? 1.4 : 1));

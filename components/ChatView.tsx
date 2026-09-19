@@ -67,8 +67,8 @@ export default function ChatView() {
       const answer = j.ok
         ? stripMd(j.answer ?? "…")
         : lang === "hi"
-          ? "क्षमा करें, अभी उत्तर नहीं मिला — दोबारा पूछें।"
-          : "Sorry, I couldn't answer that — please ask again.";
+          ? "क्षमा करें, अभी उत्तर नहीं मिला, दोबारा पूछें।"
+          : "Sorry, I couldn't answer that, please ask again.";
       setMessages((m) => [...m, { role: "assistant", text: answer, source: j.source }]);
       speak(answer);
     } catch {
@@ -76,7 +76,7 @@ export default function ChatView() {
         ...m,
         {
           role: "assistant",
-          text: lang === "hi" ? "नेटवर्क समस्या — दोबारा कोशिश करें।" : "Network issue — please try again.",
+          text: lang === "hi" ? "नेटवर्क समस्या, दोबारा कोशिश करें।" : "Network issue, please try again.",
         },
       ]);
     } finally {
@@ -97,7 +97,7 @@ export default function ChatView() {
       };
       rec.onstop = () => void finishRecording();
       rec.onerror = () => {
-        setMicError(lang === "hi" ? "माइक में दिक्कत — फिर कोशिश करें।" : "Mic error — try again.");
+        setMicError(lang === "hi" ? "माइक में दिक्कत, फिर कोशिश करें।" : "Mic error, try again.");
         setListening(false);
       };
       mediaRef.current = rec;
@@ -106,8 +106,8 @@ export default function ChatView() {
     } catch {
       setMicError(
         lang === "hi"
-          ? "आवाज़ के लिए अनुमति चाहिए — लिखकर भी पूछ सकते हैं।"
-          : "Mic permission needed — typing works everywhere.",
+          ? "आवाज़ के लिए अनुमति चाहिए, लिखकर भी पूछ सकते हैं।"
+          : "Mic permission needed, typing works everywhere.",
       );
       setListening(false);
     }
@@ -122,7 +122,7 @@ export default function ChatView() {
     streamRef.current?.getTracks().forEach((tr) => tr.stop());
     const blob = new Blob(chunksRef.current, { type: mediaRef.current?.mimeType || "audio/webm" });
     if (blob.size < 1200) {
-      setMicError(lang === "hi" ? "कुछ सुनाई नहीं दिया — थोड़ा और बोलें।" : "Heard nothing — speak a little longer.");
+      setMicError(lang === "hi" ? "कुछ सुनाई नहीं दिया, थोड़ा और बोलें।" : "Heard nothing, speak a little longer.");
       return;
     }
     setTranscribing(true);
@@ -140,8 +140,8 @@ export default function ChatView() {
     } catch {
       setMicError(
         lang === "hi"
-          ? "आवाज़ अभी काम नहीं कर रही — लिखकर पूछें।"
-          : "Voice isn't working right now — please type.",
+          ? "आवाज़ अभी काम नहीं कर रही, लिखकर पूछें।"
+          : "Voice isn't working right now, please type.",
       );
     } finally {
       setTranscribing(false);
@@ -151,8 +151,8 @@ export default function ChatView() {
   const chips = [t(lang, "q1"), t(lang, "q2"), t(lang, "q3")];
   const hello =
     lang === "hi"
-      ? "नमस्ते! मैं RADAAR हूँ। अपनी दुकान के बारे में कुछ भी पूछिए — बिक्री, ग्राहक, ऑफ़र। 👋"
-      : "Namaste! I'm RADAAR. Ask me anything about your shop — sales, customers, offers. 👋";
+      ? "नमस्ते! मैं RADAAR हूँ। अपनी दुकान के बारे में कुछ भी पूछिए, बिक्री, ग्राहक, ऑफ़र। 👋"
+      : "Namaste! I'm RADAAR. Ask me anything about your shop: sales, customers, offers. 👋";
 
   const status = listening
     ? `🎙️ ${t(lang, "chatListening")}`
@@ -263,8 +263,8 @@ export default function ChatView() {
           </p>
           <p className="mt-1 text-sm font-semibold text-cocoa">
             {lang === "hi"
-              ? "हिंदी, अंग्रेज़ी या हिंग्लिश — जैसे दुकान पर बोलते हैं। RADAAR सुनेगा, समझेगा, और बोलकर जवाब देगा।"
-              : "Hindi, English or Hinglish — however you talk at the shop. RADAAR listens, understands, and answers out loud."}
+              ? "हिंदी, अंग्रेज़ी या हिंग्लिश, जैसे दुकान पर बोलते हैं। RADAAR सुनेगा, समझेगा, और बोलकर जवाब देगा।"
+              : "Hindi, English or Hinglish, however you talk at the shop. RADAAR listens, understands, and answers out loud."}
           </p>
         </section>
         <section className="card3d pop-in p-6" style={{ animationDelay: ".18s" }}>
@@ -273,8 +273,8 @@ export default function ChatView() {
           </p>
           <p className="mt-2 text-sm font-semibold text-cocoa">
             {lang === "hi"
-              ? "हर जवाब आपके ही व्यापार की स्मृति (memory graph) से आता है — RADAAR कुछ भी अंदाज़े से नहीं कहता।"
-              : "Every answer is retrieved from your own business memory graph — RADAAR never guesses."}
+              ? "हर जवाब आपके ही व्यापार की स्मृति (memory graph) से आता है, RADAAR कुछ भी अंदाज़े से नहीं कहता।"
+              : "Every answer is retrieved from your own business memory graph, RADAAR never guesses."}
           </p>
         </section>
       </aside>

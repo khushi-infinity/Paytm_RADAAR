@@ -20,7 +20,7 @@ export function loadEnv(): void {
 export function env(name: string): string {
   loadEnv();
   const v = process.env[name];
-  if (!v) throw new Error(`Missing env var ${name} — check .env`);
+  if (!v) throw new Error(`Missing env var ${name}, check .env`);
   return v.trim();
 }
 

@@ -1,5 +1,5 @@
 /**
- * The friendly layer — turns the intelligence spine's output into the few
+ * The friendly layer, turns the intelligence spine's output into the few
  * warm, plain-language numbers a merchant actually needs. The full snapshot
  * stays available for the "My Business" tab and the chat, but HOME shows
  * only what this module returns. No jargon survives this layer.
@@ -59,7 +59,7 @@ function angleFor(id: string): number {
 
 /** The user asked for no em dashes anywhere in the UI. */
 export function noDash(s: string): string {
-  return s.replace(/\s*—\s*/g, ", ").replace(/\s+,/g, ",");
+  return s.replace(/\s*\u2013\s*/g, "-").replace(/\s*\u2014\s*/g, ", ").replace(/\s+,/g, ",");
 }
 
 /**
@@ -166,7 +166,7 @@ export function deltaPhrase(lang: Lang, deltaPct: number, thing: "sales" | "cust
 /** Trend line → plain sentence. English copy comes from the engine; Hindi is mapped here. */
 export function trendPhrase(lang: Lang, window: string, direction: "up" | "down", deltaPct: number): string {
   const pct = `${Math.abs(Math.round(deltaPct))}%`;
-  if (lang === "en") return `${direction === "up" ? "Up" : "Down"} ${pct} — ${window}`;
+  if (lang === "en") return `${direction === "up" ? "Up" : "Down"} ${pct}, ${window}`;
   const win = hindiWindow(window);
   return direction === "up" ? `${win} बिक्री ${pct} बढ़ी` : `${win} बिक्री ${pct} गिरी`;
 }
@@ -174,10 +174,10 @@ export function trendPhrase(lang: Lang, window: string, direction: "up" | "down"
 export function anomalyPhrase(lang: Lang, description: string): string {
   if (lang === "en") return description;
   const d = description.toLowerCase();
-  if (d.includes("large transaction")) return "एक बहुत बड़ा भुगतान आया — अच्छी बात, पर जान लें।";
-  if (d.includes("refund")) return "कई वापसी (refund) एक साथ हुईं — एक बार जाँच लें।";
-  if (d.includes("traffic")) return "ग्राहकों की भीड़ अचानक कम हुई थी — ध्यान दें।";
-  if (d.includes("duplicate")) return "एक जैसे भुगतान बार-बार दिखे — जाँच कर लें।";
+  if (d.includes("large transaction")) return "एक बहुत बड़ा भुगतान आया, अच्छी बात, पर जान लें।";
+  if (d.includes("refund")) return "कई वापसी (refund) एक साथ हुईं, एक बार जाँच लें।";
+  if (d.includes("traffic")) return "ग्राहकों की भीड़ अचानक कम हुई थी, ध्यान दें।";
+  if (d.includes("duplicate")) return "एक जैसे भुगतान बार-बार दिखे, जाँच कर लें।";
   return description;
 }
 
@@ -202,7 +202,7 @@ export function segmentPhrase(lang: Lang, segment: string): string {
 
 export function hindiWindow(window: string): string {
   const w = window.toLowerCase();
-  if (w.includes("evening")) return "शाम के समय (5–8 बजे)";
+  if (w.includes("evening")) return "शाम के समय (5-8 बजे)";
   if (w.includes("this week")) return "इस हफ़्ते";
   if (w.includes("average transaction")) return "औसत बिल";
   if (w.includes("weekend")) return "वीकेंड";

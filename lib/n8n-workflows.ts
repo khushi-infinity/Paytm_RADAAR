@@ -1,13 +1,13 @@
 /**
- * RADAAR n8n workflow definitions — the deck's Action Layer + Learning Loop,
+ * RADAAR n8n workflow definitions, the deck's Action Layer + Learning Loop,
  * living inside the merchant's own n8n instance (visible to judges).
  *
- *  1. radaar-ingest-detect  — spine POSTs a snapshot; n8n decides if action is
+ *  1. radaar-ingest-detect, spine POSTs a snapshot; n8n decides if action is
  *     needed, calls Sarvam for a Hinglish nudge, and writes the insight into
- *     Cognee memory (multipart add — same contract verified in PROGRESS.md).
- *  2. radaar-offer-dispatch — merchant accepts an action; n8n simulates the
+ *     Cognee memory (multipart add, same contract verified in PROGRESS.md).
+ *  2. radaar-offer-dispatch, merchant accepts an action; n8n simulates the
  *     WhatsApp delivery (named mock recipients) and records the dispatch fact.
- *  3. radaar-outcome-loop   — measured revenue delta flows back; n8n computes
+ *  3. radaar-outcome-loop, measured revenue delta flows back; n8n computes
  *     the verdict and writes the learning-loop fact into Cognee.
  *
  * Secrets are referenced as {{ $env.* }} expressions. The deploy script can
@@ -312,7 +312,7 @@ function bakeNode(node: N8nNode, values: Record<string, string>): void {
   const walk = (v: unknown): unknown => {
     if (typeof v === "string") {
       const baked = v.replace(/\{\{\s*\$env\.([A-Z0-9_]+)\s*\}\}/g, (_m, name) => values[name] ?? _m);
-      // "={{ $env.X }}" becomes "=literal" after baking — drop the expression marker
+      // "={{ $env.X }}" becomes "=literal" after baking, drop the expression marker
       if (baked.startsWith("=") && !baked.includes("{{")) return baked.slice(1);
       return baked;
     }

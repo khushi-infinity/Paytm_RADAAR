@@ -1,5 +1,5 @@
 /**
- * Sarvam AI client — vernacular copilot text generation.
+ * Sarvam AI client, vernacular copilot text generation.
  * Verified working params (see PROGRESS.md):
  *   POST https://api.sarvam.ai/v1/chat/completions
  *   header: api-subscription-key
@@ -10,7 +10,7 @@ const SARVAM_BASE = "https://api.sarvam.ai";
 
 function reqEnv(name: string): string {
   const v = process.env[name];
-  if (!v) throw new Error(`Missing env var ${name} — check .env`);
+  if (!v) throw new Error(`Missing env var ${name}, check .env`);
   return v.trim();
 }
 
@@ -32,7 +32,7 @@ export async function sarvamChat(
       ],
       temperature: opts.temperature ?? 0.4,
       // Verified live: JSON null DISABLES reasoning ("low" does not on this
-      // deployment — the model still burns thousands of tokens thinking).
+      // deployment, the model still burns thousands of tokens thinking).
       reasoning_effort: null,
       max_tokens: opts.maxTokens ?? 1000,
     }),
@@ -47,7 +47,7 @@ export async function sarvamChat(
   const msg = j.choices?.[0]?.message;
   let text = (msg?.content ?? "").trim();
   if (!text && msg?.reasoning_content) {
-    // Fallback: the model spent everything on reasoning — take its last line.
+    // Fallback: the model spent everything on reasoning, take its last line.
     text = msg.reasoning_content.trim().split("\n").filter(Boolean).pop() ?? "";
   }
   text = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();

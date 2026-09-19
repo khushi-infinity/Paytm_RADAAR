@@ -52,7 +52,7 @@ export async function POST(req: Request) {
         if (answer) return NextResponse.json({ ok: true, answer, source: "memory-graph" });
       }
     } catch {
-      // graph unavailable — fall through to snapshot-grounded answer
+      // graph unavailable, fall through to snapshot-grounded answer
     }
 
     // 2) Fallback: Sarvam answers strictly from the live snapshot facts

@@ -20,8 +20,8 @@ export async function POST(req: Request) {
     const body = (await req.json()) as OutcomeBody;
     const merchant = body.merchant?.trim() || "RADAAR demo merchant";
 
-    // Simulated "one week later" measurement — plausible positive uplift
-    // (3–9% of weekly revenue) with slight randomness for demo variety.
+    // Simulated "one week later" measurement, plausible positive uplift
+    // (3-9% of weekly revenue) with slight randomness for demo variety.
     const upliftPct = +(3 + Math.random() * 6).toFixed(1);
     const revenueDelta = Math.round((body.weeklyRevenue * upliftPct) / 100);
     const date = new Date(Date.now() + 7 * 86_400_000).toISOString().slice(0, 10);

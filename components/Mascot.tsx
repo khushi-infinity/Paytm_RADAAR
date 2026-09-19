@@ -1,5 +1,5 @@
 /**
- * DADA — the RADAAR mascot. A little clay robot whose head is a radar dish.
+ * DADA, the RADAAR mascot. A little clay robot whose head is a radar dish.
  * Pure SVG, claymorphic shading: key light top-left, cool occlusion below.
  */
 export default function Mascot({ size = 300, className = "" }: { size?: number; className?: string }) {

@@ -1,12 +1,12 @@
 /**
- * Cognee Cloud client — merchant memory / knowledge graph.
+ * Cognee Cloud client, merchant memory / knowledge graph.
  *
  * Contract verified live against tenant (see PROGRESS.md):
- *  1. POST /api/v1/add          — multipart/form-data: data=<file> + datasetName=<string>
+ *  1. POST /api/v1/add, multipart/form-data: data=<file> + datasetName=<string>
  *                                 (auto-ingests; returns data_id)
- *  2. POST /api/v1/cognify      — JSON {datasets:[name]} → PipelineRunStarted, graph builds async
- *                                 (each call STARTS a run — never poll by re-POSTing)
- *  3. POST /api/v1/search       — JSON {searchType, query, datasets:[name]}
+ *  2. POST /api/v1/cognify, JSON {datasets:[name]} → PipelineRunStarted, graph builds async
+ *                                 (each call STARTS a run, never poll by re-POSTing)
+ *  3. POST /api/v1/search, JSON {searchType, query, datasets:[name]}
  *                                 GRAPH_COMPLETION → LLM answer grounded in the graph
  *                                 CHUNKS → raw stored chunks
  *  Health at root /health. Never call with trailing slashes (307).
@@ -19,7 +19,7 @@ export const MEMORY_DATASET = "radaar_merchant_memory";
 
 function reqEnv(name: string): string {
   const v = process.env[name];
-  if (!v) throw new Error(`Missing env var ${name} — check .env`);
+  if (!v) throw new Error(`Missing env var ${name}, check .env`);
   return v.trim();
 }
 
@@ -163,7 +163,7 @@ export async function askWhenReady(
         if (answers.length > 0) return { answer: answers.join("\n"), attempts: i };
       }
     } catch (e) {
-      // search can 4xx while the pipeline is mid-build — keep polling
+      // search can 4xx while the pipeline is mid-build, keep polling
       if (i === maxAttempts) throw e;
     }
     await new Promise((r) => setTimeout(r, intervalMs));
@@ -171,7 +171,7 @@ export async function askWhenReady(
   throw new Error(`Graph not ready after ${maxAttempts} attempts for "${query}"`);
 }
 
-// ─── Fact shaping (deterministic — no LLM, keeps memory crisp) ──────────────
+// ─── Fact shaping (deterministic, no LLM, keeps memory crisp) ──────────────
 
 const inr = (n: number) => Math.round(n).toLocaleString("en-IN");
 
@@ -192,7 +192,7 @@ export function snapshotToFacts(snap: BusinessSnapshot): string[] {
 
   for (const a of snap.anomalies) {
     facts.push(
-      `ANOMALY ${d}: ${snap.merchantName} — ${a.description} (detection z-score ${a.zScore.toFixed(1)}, type ${a.kind}).`,
+      `ANOMALY ${d}: ${snap.merchantName}, ${a.description} (detection z-score ${a.zScore.toFixed(1)}, type ${a.kind}).`,
     );
   }
 

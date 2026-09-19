@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       signal: AbortSignal.timeout(45_000),
     });
     if (!res.ok) {
-      // Never surface Sarvam's raw error payloads to the UI — log details,
+      // Never surface Sarvam's raw error payloads to the UI, log details,
       // return a short human-readable reason.
       const body = await res.text().catch(() => "");
       console.error("[stt] Sarvam error", res.status, body.slice(0, 300));
@@ -36,8 +36,8 @@ export async function POST(req: Request) {
           ok: false,
           error:
             res.status === 400
-              ? "Audio format rejected — WAV conversion failed."
-              : "Speech service busy — try again in a moment.",
+              ? "Audio format rejected, WAV conversion failed."
+              : "Speech service busy, try again in a moment.",
         },
         { status: 502 },
       );

@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 /**
- * GET /api/memory — what RADAAR actually remembers.
+ * GET /api/memory, what RADAAR actually remembers.
  * Reads raw chunks from the Cognee graph so judges can SEE the memory
  * (insight / offer / outcome facts) that answers are grounded in.
  */
@@ -52,7 +52,7 @@ export async function GET() {
       }
     }
   } catch {
-    // graph unavailable — the audit log alone is still truthful
+    // graph unavailable, the audit log alone is still truthful
   }
 
   return NextResponse.json({ ok: facts.length > 0, dataset: MEMORY_DATASET, graph, facts });

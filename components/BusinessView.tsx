@@ -28,7 +28,7 @@ function memToPlain(f: MemFact, lang: "en" | "hi"): string {
   }
   if (f.kind === "OFFER_DISPATCHED")
     return f.fact.includes("Hinglish")
-      ? "ऑफ़र भेजी गई — संदेश: " + (f.fact.split('"')[1] ?? "")
+      ? "ऑफ़र भेजी गई, संदेश: " + (f.fact.split('"')[1] ?? "")
       : "ऑफ़र ग्राहकों को भेजी गई।";
   if (f.kind === "OFFER_OUTCOME") {
     const m = f.fact.match(/\+?₹?[\d,]+ rupees \(\+?[\d.]+%\)/);

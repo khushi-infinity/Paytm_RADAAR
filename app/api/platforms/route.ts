@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/platforms — public (non-secret) endpoints of the sponsor platforms
+ * GET /api/platforms, public (non-secret) endpoints of the sponsor platforms
  * this build runs on, so the UI can link judges straight to the live n8n
  * instance and label the AI stack honestly. Keys are NEVER returned.
  */

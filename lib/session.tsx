@@ -37,7 +37,7 @@ interface SessionCtx {
   loading: boolean;
   loadError: string | null;
   reload: () => void;
-  // offer loop — per card, keyed by card id so every card runs its own loop
+  // offer loop, per card, keyed by card id so every card runs its own loop
   stageOf: (cardId: string) => OfferStage;
   offerOf: (cardId: string) => OfferInfo | null;
   outcomeOf: (cardId: string) => OutcomeInfo | null;
@@ -131,7 +131,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
             signal,
             why,
             action,
-            impact: impactLow > 0 && impactHigh > 0 ? `₹${impactLow.toLocaleString("en-IN")}–₹${impactHigh.toLocaleString("en-IN")}` : "",
+            impact: impactLow > 0 && impactHigh > 0 ? `₹${impactLow.toLocaleString("en-IN")}-₹${impactHigh.toLocaleString("en-IN")}` : "",
             audience: "at_risk",
             audienceSize: Math.max(1, targetSize),
             merchant: snap.merchantName,

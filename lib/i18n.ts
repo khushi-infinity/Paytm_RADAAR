@@ -1,6 +1,5 @@
 /**
- * Merchant-first bilingual dictionary. Every visible string comes from here —
- * the language toggle translates the WHOLE dashboard instantly.
+ * Merchant-first bilingual dictionary. Every visible string comes from here, * the language toggle translates the WHOLE dashboard instantly.
  */
 
 export type Lang = "en" | "hi";
@@ -79,8 +78,8 @@ export const STR = {
   bizPayments: { en: "How customers pay", hi: "ग्राहक कैसे भुगतान करते हैं" },
   bizMemory: { en: "What RADAAR remembers", hi: "RADAAR को क्या याद है" },
   memoryEmpty: {
-    en: "Nothing yet — RADAAR remembers after your first offer.",
-    hi: "अभी कुछ नहीं — पहली ऑफ़र के बाद RADAAR याद रखेगा।",
+    en: "Nothing yet, RADAAR remembers after your first offer.",
+    hi: "अभी कुछ नहीं, पहली ऑफ़र के बाद RADAAR याद रखेगा।",
   },
 
   // Chat tab

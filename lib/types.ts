@@ -19,7 +19,7 @@ export interface Customer {
   visitCount: number;
   totalSpend: number;
   segment: "regular" | "new" | "at_risk" | "inactive";
-  isWeekdayEveningRegular: boolean; // buys 5–8 PM on weekdays often
+  isWeekdayEveningRegular: boolean; // buys 5-8 PM on weekdays often
 }
 
 // ─── Feature layer outputs ──────────────────────────────────────────────────
@@ -27,7 +27,7 @@ export interface Customer {
 export interface Trend {
   id: string;
   metric: "revenue" | "transactions" | "avg_ticket" | "unique_customers";
-  window: string; // human label e.g. "weekday evenings (5–8 PM)"
+  window: string; // human label e.g. "weekday evenings (5-8 PM)"
   direction: "up" | "down";
   deltaPct: number; // vs baseline
   baselineLabel: string; // e.g. "weekend baseline"

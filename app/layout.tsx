@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RADAAR — आपके व्यापार का साथी",
-  description: "Your business, explained simply — in Hindi and English.",
+  title: "RADAAR · आपके व्यापार का साथी",
+  description: "Your business, explained simply, in Hindi and English.",
 };
 
 export const viewport: Viewport = {

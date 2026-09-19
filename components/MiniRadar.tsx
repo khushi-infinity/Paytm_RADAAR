@@ -11,13 +11,13 @@ export interface MiniBlip {
 }
 
 const SEV_COLOR: Record<MiniBlip["severity"], string> = {
-  opportunity: "#3D9BE9", // sky — a friendly chance
-  watch: "#F5A623", // sun — keep an eye
-  critical: "#E5543A", // tomato — needs attention
+  opportunity: "#3D9BE9", // sky, a friendly chance
+  watch: "#F5A623", // sun, keep an eye
+  critical: "#E5543A", // tomato, needs attention
 };
 
 /**
- * A soft, friendly growth radar — 2D canvas, pastel rings, warm sweep,
+ * A soft, friendly growth radar, 2D canvas, pastel rings, warm sweep,
  * glowing blips with gentle pings. Deliberately calmer than a cockpit:
  * the merchant should feel "my shop at a glance", not "trading desk".
  */

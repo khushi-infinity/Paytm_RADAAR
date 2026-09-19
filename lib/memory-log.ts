@@ -2,13 +2,13 @@ import { appendFile, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
- * Memory audit log — a local outbox of the exact facts this server has written
+ * Memory audit log, a local outbox of the exact facts this server has written
  * to the Cognee graph. This is NOT mock data: every entry records a real
  * dispatched offer or measured outcome from the live app. It exists because
  * Cognee's chunk search returns LLM-processed summaries rather than raw stored
  * text, and the "What RADAAR remembers" panel must show ground truth.
  *
- * Written to .data/memory-log.jsonl (gitignored) — append-only, survives restarts.
+ * Written to .data/memory-log.jsonl (gitignored), append-only, survives restarts.
  */
 
 const DIR = path.join(process.cwd(), ".data");

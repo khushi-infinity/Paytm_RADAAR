@@ -1,5 +1,5 @@
 /**
- * RADAAR intelligence spine — live demo.
+ * RADAAR intelligence spine, live demo.
  * Generates synthetic Paytm-style data, runs feature engines,
  * and prints the full merchant snapshot (KPIs, trends, anomalies,
  * segments, insight cards).
@@ -17,7 +17,7 @@ const snap = buildSnapshot(data.transactions, data.customers, data.merchantName,
 const inr = (n: number) => "₹" + Math.round(n).toLocaleString("en-IN");
 const bar = "─".repeat(64);
 
-console.log("\n📡 RADAAR — " + snap.merchantName);
+console.log("\n📡 RADAAR, " + snap.merchantName);
 console.log(bar);
 console.log(`Business Health   ${snap.health.score}/100 (${snap.health.grade})`);
 console.log(`Revenue (wk)      ${inr(snap.revenue.thisWeek)}  (${snap.revenue.deltaPct >= 0 ? "+" : ""}${snap.revenue.deltaPct}% vs last week)`);

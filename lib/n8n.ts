@@ -1,5 +1,5 @@
 /**
- * n8n Cloud API client — minimal typed wrapper around the public API v1.
+ * n8n Cloud API client, minimal typed wrapper around the public API v1.
  * Docs: https://docs.n8n.io/api/
  *
  * Auth: `X-N8N-API-KEY` header (created in n8n UI → Settings → n8n API).
@@ -28,7 +28,7 @@ export interface N8nWorkflow extends N8nWorkflowDef {
 
 function reqEnv(name: string): string {
   const v = process.env[name];
-  if (!v) throw new Error(`Missing env var ${name} — check .env`);
+  if (!v) throw new Error(`Missing env var ${name}, check .env`);
   return v.trim();
 }
 
@@ -68,7 +68,7 @@ export async function deactivateWorkflow(id: string): Promise<void> {
   try {
     await api(`/workflows/${id}/deactivate`, { method: "POST" });
   } catch {
-    // already inactive — fine
+    // already inactive, fine
   }
 }
 

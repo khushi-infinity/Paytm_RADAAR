@@ -1,12 +1,12 @@
 /**
- * RADAAR end-to-end pipeline — the "Best AI Usage" proof.
+ * RADAAR end-to-end pipeline, the "Best AI Usage" proof.
  *
  *  1. Intelligence spine generates the merchant snapshot (deterministic seed)
  *  2. Deploys + activates the 3 n8n workflows (programmatic, secrets baked from .env)
  *  3. POSTs the snapshot → n8n asks Sarvam for a Hinglish nudge → Cognee memory
  *  4. POSTs an offer dispatch → mock WhatsApp delivery → Cognee memory
  *  5. POSTs a measured outcome → learning-loop verdict → Cognee memory
- *  6. Cognifies the memory dataset and asks it questions — answers must be
+ *  6. Cognifies the memory dataset and asks it questions, answers must be
  *     GROUNDED (matching the facts we sent, no hallucination)
  *
  * Run with:  npm run pipeline
@@ -67,10 +67,10 @@ async function main() {
   // ── 0. Reset demo state ─────────────────────────────────────────────────
   step("0 · Resetting demo state (fresh Cognee memory dataset)");
   const deleted = await deleteDataset(DATASET);
-  ok(deleted ? `old dataset "${DATASET}" deleted — clean slate` : `no existing dataset "${DATASET}" — fresh start`);
+  ok(deleted ? `old dataset "${DATASET}" deleted, clean slate` : `no existing dataset "${DATASET}", fresh start`);
 
   // ── 1. Intelligence spine ────────────────────────────────────────────────
-  step("1 · Intelligence spine — generate merchant snapshot");
+  step("1 · Intelligence spine, generate merchant snapshot");
   const data = generateMerchantData({ days: 90, seed: 42 });
   const snap = buildSnapshot(data.transactions, data.customers, data.merchantName, data.now);
   const top = snap.cards[0];
@@ -156,7 +156,7 @@ async function main() {
     upliftPct,
     window: "following week",
   });
-  ok(`n8n verdict: ${outcomeRes.verdict} — ${outcomeRes.lesson}`);
+  ok(`n8n verdict: ${outcomeRes.verdict}, ${outcomeRes.lesson}`);
 
   // ── 6. Grounded copilot answers from Cognee ──────────────────────────────
   step("6 · Cognify memory dataset + ask the graph (answers must be grounded)");

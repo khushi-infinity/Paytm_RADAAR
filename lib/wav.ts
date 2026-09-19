@@ -1,6 +1,6 @@
 /**
  * Convert a recorded audio Blob (webm/opus from MediaRecorder) into a
- * 16 kHz mono 16-bit PCM WAV — the format Sarvam saarika STT accepts.
+ * 16 kHz mono 16-bit PCM WAV, the format Sarvam saarika STT accepts.
  * Runs entirely in the browser via WebAudio.
  */
 export async function blobToWav(blob: Blob, targetRate = 16000): Promise<Blob> {
