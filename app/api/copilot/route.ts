@@ -44,6 +44,31 @@ function snapshotFacts(): string {
   ].join(" ");
 }
 
+/**
+ * Keep answers merchant-short: strip markdown, take the first sentence, add a
+ * second only if it fits the character budget. Applies to BOTH answer paths so
+ * the copilot never lectures (in text or in voice).
+ */
+function trimAnswer(raw: string, maxSentences = 2, maxChars = 260): string {
+  const clean = raw
+    .replace(/\s+/g, " ")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/(?<![\w*])\*([^*\n]+)\*(?![\w*])/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^\s*[-*•#]+\s*/, "")
+    .trim();
+  const sentences = clean.split(/(?<=[।.!?])\s+/).filter((x) => x.trim().length > 0);
+  let picked = sentences[0] ?? clean;
+  for (let i = 1; i < sentences.length && i < maxSentences; i++) {
+    if ((picked + " " + sentences[i]).length > maxChars) break;
+    picked += " " + sentences[i];
+  }
+  if (picked.length > maxChars) {
+    picked = picked.slice(0, maxChars).replace(/\s+\S*$/, "") + "…";
+  }
+  return picked;
+}
+
 export async function POST(req: Request) {
   try {
     const { message } = (await req.json()) as { message?: string };
@@ -58,10 +83,10 @@ export async function POST(req: Request) {
         graphReadyUntil = Date.now() + GRAPH_READY_TTL_MS;
       }
       const answers = await search(MEMORY_DATASET, q, "GRAPH_COMPLETION" as SearchType, CHAT_SEARCH_TIMEOUT_MS);
-      const answer = answers.filter((a) => a.trim()).join("\n");
+      const answer = answers.filter((a) => a.trim()).join(" ");
       if (answer) {
         graphReadyUntil = Date.now() + GRAPH_READY_TTL_MS;
-        return NextResponse.json({ ok: true, answer, source: "memory-graph" });
+        return NextResponse.json({ ok: true, answer: trimAnswer(answer), source: "memory-graph" });
       }
     } catch {
       // graph unavailable or slow, fall through to snapshot-grounded answer
@@ -69,10 +94,10 @@ export async function POST(req: Request) {
 
     // 2) Fallback: Sarvam answers strictly from the live snapshot facts
     const answer = await sarvamChat(
-      `Merchant data: ${snapshotFacts()}\n\nQuestion: ${q}\n\nAnswer in at most 4 short sentences using ONLY the data above. If the answer is not in the data, say what related information IS available. Reply in the same language as the question (Hinglish if mixed).`,
-      { system: "You are RADAAR, a concise business copilot for an Indian merchant.", maxTokens: 600 },
+      `Merchant data: ${snapshotFacts()}\n\nQuestion: ${q}\n\nAnswer in at most 2 short sentences using ONLY the data above. If the answer is not in the data, say what related information IS available. Reply in the same language as the question (Hinglish if mixed).`,
+      { system: "You are RADAAR, a concise business copilot for an Indian merchant. Never use more than two sentences.", maxTokens: 250 },
     );
-    return NextResponse.json({ ok: true, answer, source: "live-snapshot" });
+    return NextResponse.json({ ok: true, answer: trimAnswer(answer), source: "live-snapshot" });
   } catch (e) {
     return NextResponse.json(
       { ok: false, error: e instanceof Error ? e.message : "copilot failed" },

@@ -238,6 +238,9 @@ Useful extras: `npm run demo` (generates + explains one merchant snapshot in the
 terminal) · `npm run typecheck` · deep links `?lang=hi|en` and
 `?tab=home|business|chat` (used for the screenshots above, handy for demos).
 
+**Deploying?** See [DEPLOY.md](DEPLOY.md): Railway (recommended) or Vercel,
+env vars, and a demo-day checklist.
+
 ## Design: why it looks like this
 
 The reference is a claymorphic kids-entertainment UI, and we stole its
