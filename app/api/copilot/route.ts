@@ -8,6 +8,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
+// Chat latency guards: skip the graph readiness probe for 60s after a success,
+// and cap each chat search at 45s so the merchant always gets a timely answer
+// (falling back to live snapshot facts when the graph is slow or asleep).
+let graphReadyUntil = 0;
+const GRAPH_READY_TTL_MS = 60_000;
+const CHAT_SEARCH_TIMEOUT_MS = 45_000;
+
 let snapshot: ReturnType<typeof buildSnapshot> | null = null;
 function getSnapshot() {
   if (!snapshot) {
@@ -45,14 +52,19 @@ export async function POST(req: Request) {
 
     // 1) Preferred path: the merchant's Cognee memory graph (grounded, learned)
     try {
-      const chunks = await search(MEMORY_DATASET, "merchant offer outcome", "CHUNKS" as SearchType);
-      if (chunks.length > 0) {
-        const answers = await search(MEMORY_DATASET, q, "GRAPH_COMPLETION" as SearchType);
-        const answer = answers.filter((a) => a.trim()).join("\n");
-        if (answer) return NextResponse.json({ ok: true, answer, source: "memory-graph" });
+      if (Date.now() > graphReadyUntil) {
+        const chunks = await search(MEMORY_DATASET, "merchant offer outcome", "CHUNKS" as SearchType, CHAT_SEARCH_TIMEOUT_MS);
+        if (chunks.length === 0) throw new Error("graph not ready");
+        graphReadyUntil = Date.now() + GRAPH_READY_TTL_MS;
+      }
+      const answers = await search(MEMORY_DATASET, q, "GRAPH_COMPLETION" as SearchType, CHAT_SEARCH_TIMEOUT_MS);
+      const answer = answers.filter((a) => a.trim()).join("\n");
+      if (answer) {
+        graphReadyUntil = Date.now() + GRAPH_READY_TTL_MS;
+        return NextResponse.json({ ok: true, answer, source: "memory-graph" });
       }
     } catch {
-      // graph unavailable, fall through to snapshot-grounded answer
+      // graph unavailable or slow, fall through to snapshot-grounded answer
     }
 
     // 2) Fallback: Sarvam answers strictly from the live snapshot facts

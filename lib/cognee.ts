@@ -123,6 +123,7 @@ export async function search(
   datasetName: string,
   query: string,
   searchType: SearchType = "GRAPH_COMPLETION",
+  timeoutMs = 120_000,
 ): Promise<string[]> {
   const res = await cog<SearchResult[]>(
     "/api/v1/search",
@@ -131,7 +132,7 @@ export async function search(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ searchType, query, datasets: [datasetName] }),
     },
-    120_000,
+    timeoutMs,
   );
   const flat = res.flatMap((r) => r.search_result ?? []);
   return flat.map((x) => (typeof x === "string" ? x : JSON.stringify(x)));

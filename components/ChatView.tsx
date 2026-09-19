@@ -6,11 +6,11 @@ import { useSession } from "@/lib/session";
 import { t } from "@/lib/i18n";
 
 interface Msg {
+  id: number;
   role: "user" | "assistant";
   text: string;
   source?: string;
 }
-
 /** Strip markdown decorations the graph models like to emit (**bold**, `code`). */
 function stripMd(s: string): string {
   return s
@@ -28,10 +28,13 @@ export default function ChatView() {
   const [listening, setListening] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
   const [voiceOn, setVoiceOn] = useState(true);
   const [micError, setMicError] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const speakIdRef = useRef(0);
+  const busyTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const mediaRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -39,22 +42,62 @@ export default function ChatView() {
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, busy]);
+  }, [messages, busy, elapsed]);
 
-  function speak(text: string) {
+  // seconds ticker while the copilot thinks, so the wait feels tracked, not stuck
+  useEffect(() => {
+    if (busy) {
+      setElapsed(0);
+      busyTickRef.current = setInterval(() => setElapsed((s) => s + 1), 1000);
+    } else if (busyTickRef.current) {
+      clearInterval(busyTickRef.current);
+      busyTickRef.current = null;
+    }
+    return () => {
+      if (busyTickRef.current) {
+        clearInterval(busyTickRef.current);
+        busyTickRef.current = null;
+      }
+    };
+  }, [busy]);
+
+  function speak(text: string, msgId: number) {
     if (!voiceOn) return;
     audioRef.current?.pause();
-    const audio = new Audio(`/api/tts?text=${encodeURIComponent(stripMd(text).slice(0, 400))}`);
-    audioRef.current = audio;
+    const myId = ++speakIdRef.current;
     setSpeaking(true);
-    audio.onended = () => setSpeaking(false);
-    void audio.play().catch(() => setSpeaking(false));
+    setSpeakingId(msgId);
+    // fetch the audio first so the bubble lights up only when voice truly plays
+    void fetch(`/api/tts?text=${encodeURIComponent(stripMd(text).slice(0, 400))}`)
+      .then((r) => (r.ok ? r.blob() : Promise.reject(new Error("tts failed"))))
+      .then((blob) => {
+        if (myId !== speakIdRef.current) return; // a newer answer took over
+        const audio = new Audio(URL.createObjectURL(blob));
+        audioRef.current = audio;
+        audio.onended = () => {
+          setSpeaking(false);
+          setSpeakingId(null);
+        };
+        audio.onerror = () => {
+          setSpeaking(false);
+          setSpeakingId(null);
+        };
+        void audio.play();
+      })
+      .catch(() => {
+        if (myId === speakIdRef.current) {
+          setSpeaking(false);
+          setSpeakingId(null);
+        }
+      });
   }
+
+  const [speakingId, setSpeakingId] = useState<number | null>(null);
 
   async function send(text: string, fromVoice = false) {
     const q = text.trim();
     if (!q || busy) return;
-    setMessages((m) => [...m, { role: "user", text: fromVoice ? `🎙️ ${q}` : q }]);
+    setMessages((m) => [...m, { id: Date.now(), role: "user", source: "user", text: fromVoice ? `🎙️ ${q}` : q }]);
     setInput("");
     setBusy(true);
     try {
@@ -64,21 +107,25 @@ export default function ChatView() {
         body: JSON.stringify({ message: q }),
       });
       const j = (await res.json()) as { ok: boolean; answer?: string; source?: string };
-      const answer = j.ok
-        ? stripMd(j.answer ?? "…")
-        : lang === "hi"
+      const fallback =
+        lang === "hi"
           ? "क्षमा करें, अभी उत्तर नहीं मिला, दोबारा पूछें।"
           : "Sorry, I couldn't answer that, please ask again.";
-      setMessages((m) => [...m, { role: "assistant", text: answer, source: j.source }]);
-      speak(answer);
+      const answer = j.ok ? stripMd(j.answer ?? "…") : fallback;
+      const id = Date.now() + 1;
+      setMessages((m) => [...m, { id, role: "assistant", text: answer, source: j.ok ? j.source : "error" }]);
+      speak(answer, id);
     } catch {
       setMessages((m) => [
         ...m,
         {
+          id: Date.now() + 1,
           role: "assistant",
           text: lang === "hi" ? "नेटवर्क समस्या, दोबारा कोशिश करें।" : "Network issue, please try again.",
+          source: "error",
         },
-      ]);
+      ]
+      );
     } finally {
       setBusy(false);
     }
@@ -159,7 +206,7 @@ export default function ChatView() {
     : transcribing
       ? `✍️ ${lang === "hi" ? "लिख रहा हूँ…" : "Writing…"}`
       : busy
-        ? `💭 ${t(lang, "chatThinking")}`
+        ? `💭 ${t(lang, "chatThinking")} · ${elapsed}s`
         : speaking
           ? `🔊 ${t(lang, "chatSpeaking")}`
           : null;
@@ -185,8 +232,8 @@ export default function ChatView() {
 
         <div ref={listRef} className="mt-4 flex-1 space-y-4 overflow-y-auto pr-2">
           {messages.length === 0 && !busy && <Bubble text={hello} source="hello" lang={lang} />}
-          {messages.map((m, i) => (
-            <Bubble key={i} text={m.text} source={m.source} lang={lang} />
+          {messages.map((m) => (
+            <Bubble key={m.id} text={m.text} source={m.source} lang={lang} speaking={speakingId === m.id} />
           ))}
           {status && (
             <div className="flex justify-start">
@@ -282,26 +329,40 @@ export default function ChatView() {
   );
 }
 
-function Bubble({ text, source, lang }: { text: string; source?: string; lang: "en" | "hi" }) {
-  const isUser = text.startsWith("🎙️") || source === undefined;
+function Bubble({
+  text,
+  source,
+  lang,
+  speaking = false,
+}: {
+  text: string;
+  source?: string;
+  lang: "en" | "hi";
+  speaking?: boolean;
+}) {
+  const isUser = source === "user";
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
-        className={`max-w-[80%] whitespace-pre-wrap px-5 py-3.5 text-lg leading-relaxed ${
+        className={`relative max-w-[80%] whitespace-pre-wrap px-5 py-3.5 text-lg leading-relaxed transition-all ${
           isUser ? "rounded-[1.6rem] rounded-br-lg text-white" : "rounded-[1.6rem] rounded-bl-lg bg-white text-ink"
-        }`}
+        } ${speaking ? "ring-4 ring-skybright/60" : ""}`}
         style={
           isUser
             ? { background: "linear-gradient(145deg,#4A7EF0,#2C63D9)", boxShadow: "0 4px 0 #2C63D9, 0 12px 22px rgba(9,34,84,.3)" }
             : { boxShadow: "0 3px 0 #C9D9F6, 0 10px 20px rgba(16,52,128,.15)" }
         }
       >
+        {speaking && <span className="mr-2 inline-block animate-pulse">🔊</span>}
         {text}
         {source === "memory-graph" && (
           <span className="mt-1 block text-sm font-extrabold text-leafdeep">🧠 {t(lang, "cogneeBadge")}</span>
         )}
         {source === "live-snapshot" && (
           <span className="mt-1 block text-sm font-extrabold text-sun">📊 {t(lang, "snapshotBadge")}</span>
+        )}
+        {source === "error" && (
+          <span className="mt-1 block text-sm font-extrabold text-tomato">⚠️ {lang === "hi" ? "जवाब नहीं बन पाया" : "Could not answer"}</span>
         )}
       </div>
     </div>
