@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-cream text-ink antialiased;
+  font-family: "Baloo 2", ui-rounded, "Quicksand", system-ui, sans-serif;
+  background-image:
+    radial-gradient(ellipse 70% 40% at 85% -10%, rgba(255, 193, 94, 0.20), transparent),
+    radial-gradient(ellipse 60% 35% at 0% 100%, rgba(255, 138, 101, 0.12), transparent);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-3xl shadow-soft p-5;
+  }
+  .big-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full font-bold transition-all active:scale-95;
+  }
+  .big-btn-primary {
+    @apply big-btn bg-tomato text-white px-6 py-3 text-lg hover:bg-peach shadow-pop;
+  }
+  .big-btn-leaf {
+    @apply big-btn bg-leaf text-white px-6 py-3 text-lg hover:bg-leafdeep;
+  }
+  .big-btn-sky {
+    @apply big-btn bg-sky text-white px-6 py-3 text-lg hover:bg-skydeep;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold;
+  }
+}
+
+/* big friendly tab bar */
+.tabbar-item {
+  @apply flex-1 flex flex-col items-center gap-0.5 py-2 rounded-2xl text-sm font-bold text-cocoa transition-colors;
+}
+.tabbar-item[data-active="true"] {
+  @apply bg-white text-tomato shadow-soft;
+}
+
+/* hide number input spinners etc, keep it simple */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
